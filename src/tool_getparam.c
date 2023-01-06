@@ -112,7 +112,9 @@ static const struct LongShort aliases[]= {
   {"*r", "create-dirs",              ARG_BOOL},
   {"*R", "create-file-mode",         ARG_STRING},
   {"*s", "max-redirs",               ARG_STRING},
+  {"*S", "sidecar",                  ARG_STRING},
   {"*t", "proxy-ntlm",               ARG_BOOL},
+  {"*T", "threshold",                ARG_STRING},
   {"*u", "crlf",                     ARG_BOOL},
   {"*v", "stderr",                   ARG_FILENAME},
   {"*V", "aws-sigv4",                ARG_STRING},
@@ -1005,10 +1007,20 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           return PARAM_BAD_NUMERIC;
         break;
 
+      case 'S': /* --sidecar */
+        GetStr(&config->sidecar_iface, nextarg);
+        break;
+
       case 't': /* --proxy-ntlm */
         if(!feature_ntlm)
           return PARAM_LIBCURL_DOESNT_SUPPORT;
         config->proxyntlm = toggle;
+        break;
+
+      case 'T': /* --threshold */
+        err = str2num(&config->sidecar_threshold, nextarg);
+        if(err)
+          return err;
         break;
 
       case 'u': /* --crlf */
