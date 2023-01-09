@@ -3119,6 +3119,19 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_QUICK_EXIT:
     data->set.quick_exit = (0 != va_arg(param, long)) ? 1L:0L;
     break;
+
+#ifdef USE_QUICHE
+  case CURLOPT_QUICHE_CC:
+    data->set.quiche_cc = va_arg(param, char *);
+    break;
+  case CURLOPT_SIDECAR_INTERFACE:
+    data->set.sidecar_iface = va_arg(param, char *);
+    break;
+  case CURLOPT_THRESHOLD:
+    data->set.sidecar_threshold = va_arg(param, long);
+    break;
+#endif
+
   default:
     /* unknown tag and its companion, just ignore: */
     result = CURLE_UNKNOWN_OPTION;

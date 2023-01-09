@@ -940,6 +940,12 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             fclose(etag_save->stream);
           break;
         }
+#ifdef USE_QUICHE
+        // TODO(masot): Who knows where this should really go lol
+        my_setopt(curl, CURLOPT_QUICHE_CC, config->quiche_cc);
+        my_setopt(curl, CURLOPT_SIDECAR_INTERFACE, config->sidecar_iface);
+        my_setopt(curl, CURLOPT_THRESHOLD, config->sidecar_threshold);
+#endif
         per->etag_save = etag_first; /* copy the whole struct */
         if(state->uploadfile) {
           per->uploadfile = strdup(state->uploadfile);
