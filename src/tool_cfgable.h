@@ -47,6 +47,7 @@ struct State {
 struct OperationConfig {
   char *sidecar_iface;
   long sidecar_threshold;
+  char *quiche_cc;
   bool remote_time;
   char *useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */

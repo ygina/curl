@@ -109,6 +109,7 @@ static const struct LongShort aliases[]= {
   {"*p", "wdebug",                   ARG_BOOL},
 #endif
   {"*q", "ftp-create-dirs",          ARG_BOOL},
+  {"*Q", "quiche-cc",                ARG_STRING},
   {"*r", "create-dirs",              ARG_BOOL},
   {"*R", "create-file-mode",         ARG_STRING},
   {"*s", "max-redirs",               ARG_STRING},
@@ -985,6 +986,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
 #endif
       case 'q': /* --ftp-create-dirs */
         config->ftp_create_dirs = toggle;
+        break;
+
+      case 'Q': /* --quiche-cc */
+        GetStr(&config->quiche_cc, nextarg);
         break;
 
       case 'r': /* --create-dirs */
