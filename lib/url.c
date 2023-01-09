@@ -1549,6 +1549,12 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
 
   /* and we setup a few fields in case we end up actually using this struct */
 
+#ifdef ENABLE_QUIC
+  conn->quiche_cc = data->set.quiche_cc;
+  conn->sidecar_iface = data->set.sidecar_iface;
+  conn->sidecar_threshold = data->set.sidecar_threshold;
+#endif
+
   conn->sock[FIRSTSOCKET] = CURL_SOCKET_BAD;     /* no file descriptor */
   conn->sock[SECONDARYSOCKET] = CURL_SOCKET_BAD; /* no file descriptor */
   conn->tempsock[0] = CURL_SOCKET_BAD; /* no file descriptor */

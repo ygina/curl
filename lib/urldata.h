@@ -916,6 +916,9 @@ struct connectdata {
   struct Curl_addrinfo *tempaddr[2]; /* for happy eyeballs */
 
 #ifdef ENABLE_QUIC
+  char *quiche_cc;
+  char *sidecar_iface;
+  size_t sidecar_threshold;
   struct quicsocket hequic[2]; /* two, for happy eyeballs! */
   struct quicsocket *quic;
 #endif
@@ -1614,6 +1617,9 @@ enum dupblob {
 typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
+  char *quiche_cc;        /* HTTP/3 quiche congestion control algorithm */
+  char *sidecar_iface;    /* sidecar interface to listen on */
+  long sidecar_threshold; /* sidecar quACK threshold number of packets */
   FILE *err;         /* the stderr user data goes here */
   void *debugdata;   /* the data that will be passed to fdebug */
   char *errorbuffer; /* (Static) store failure messages in here */
