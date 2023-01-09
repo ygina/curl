@@ -292,7 +292,14 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                        QUICHE_H3_APPLICATION_PROTOCOL,
                                        sizeof(QUICHE_H3_APPLICATION_PROTOCOL)
                                        - 1);
-  quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_CUBIC);
+  if (conn->quiche_cc != NULL) {
+    if (strcmp(conn->quiche_cc, "reno") == 0)
+      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_RENO);
+    if (strcmp(conn->quiche_cc, "cubic") == 0)
+      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_CUBIC);
+    if (strcmp(conn->quiche_cc, "bbr") == 0)
+      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_BBR);
+  }
 
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)
