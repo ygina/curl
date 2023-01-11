@@ -59,6 +59,7 @@
 #define QUIC_MAX_STREAMS (256*1024)
 #define QUIC_MAX_DATA (1*1024*1024)
 #define QUIC_IDLE_TIMEOUT (60 * 1000) /* milliseconds */
+#define QUIC_MAX_SEND_UDP_PAYLOAD_SIZE 1460
 
 static CURLcode process_ingress(struct Curl_easy *data,
                                 curl_socket_t sockfd,
@@ -280,6 +281,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   }
 
   quiche_config_set_max_idle_timeout(qs->cfg, QUIC_IDLE_TIMEOUT);
+  quiche_config_set_max_send_udp_payload_size(qs->cfg, QUIC_MAX_SEND_UDP_PAYLOAD_SIZE);
   quiche_config_set_initial_max_data(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_local(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_remote(qs->cfg,
@@ -533,7 +535,7 @@ static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
                              struct quicsocket *qs)
 {
   ssize_t sent;
-  uint8_t out[1200];
+  uint8_t out[QUIC_MAX_SEND_UDP_PAYLOAD_SIZE];
   int64_t timeout_ns;
   quiche_send_info send_info;
 
