@@ -281,7 +281,8 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   }
 
   quiche_config_set_max_idle_timeout(qs->cfg, QUIC_IDLE_TIMEOUT);
-  quiche_config_set_max_send_udp_payload_size(qs->cfg, QUIC_MAX_SEND_UDP_PAYLOAD_SIZE);
+  quiche_config_set_max_send_udp_payload_size(qs->cfg,
+                                              QUIC_MAX_SEND_UDP_PAYLOAD_SIZE);
   quiche_config_set_initial_max_data(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_local(qs->cfg, QUIC_MAX_DATA);
   quiche_config_set_initial_max_stream_data_bidi_remote(qs->cfg,
@@ -294,12 +295,12 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                        QUICHE_H3_APPLICATION_PROTOCOL,
                                        sizeof(QUICHE_H3_APPLICATION_PROTOCOL)
                                        - 1);
-  if (conn->quiche_cc != NULL) {
-    if (strcmp(conn->quiche_cc, "reno") == 0)
+  if(conn->quiche_cc) {
+    if(strcmp(conn->quiche_cc, "reno") == 0)
       quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_RENO);
-    if (strcmp(conn->quiche_cc, "cubic") == 0)
+    if(strcmp(conn->quiche_cc, "cubic") == 0)
       quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_CUBIC);
-    if (strcmp(conn->quiche_cc, "bbr") == 0)
+    if(strcmp(conn->quiche_cc, "bbr") == 0)
       quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_BBR);
   }
 
