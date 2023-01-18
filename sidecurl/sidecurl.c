@@ -10,25 +10,20 @@
 #include <time.h>
 #include "curl/curl.h"
 
-static size_t BYTES_GOTTEN = 0;
-size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-    BYTES_GOTTEN += size * nmemb;
-    // printf("Got some data of size %lu!\n", size * nmemb);
-    return size * nmemb;
-}
-
 #define checkok(x) do { assert((x) == CURLE_OK); } while (0)
 
 #define QUACK_SIZE 2048
 static char LAST_QUACK[2 * QUACK_SIZE]; /* 2x for good luck */
 
 static char *BINARY_NAME = "sidecurl";
-static char *URL = NULL;
-static FILE *BODY_INPUT_FILE = NULL;
-static char *QUICHE_CC = NULL;
-static char *SIDECAR_INTERFACE = NULL;
-static int SIDECAR_THRESHOLD = 0;
+static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
+static FILE *BODY_INPUT_FILE;
+static FILE *OUTPUT_FILE;
+static int SIDECAR_THRESHOLD, INSECURE;
+static long HTTP_VERSION = CURL_HTTP_VERSION_2_0;
+static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
+void ourWriteOut(const char *writeinfo, CURL *easy, CURLcode per_result);
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
@@ -46,12 +41,18 @@ int main(int argc, char **argv) {
     CURL *easy_handle = curl_easy_init();
     // Set cURL options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_URL, URL));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_POST, 1L));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_READDATA, BODY_INPUT_FILE));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 0L));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_WRITEFUNCTION, write_callback));
-    if (QUICHE_CC)
-        checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_3));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTP_VERSION, HTTP_VERSION));
+    if (TIMEOUT_SECS > 0.)
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_TIMEOUT_MS,
+                                 (long)(TIMEOUT_SECS * 1000)));
+    if (BODY_INPUT_FILE) {
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_POST, 1L));
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_READDATA, BODY_INPUT_FILE));
+    }
+    if (OUTPUT_FILE)
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_WRITEDATA, OUTPUT_FILE));
+    if (INSECURE)
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 0L));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_INTERFACE, SIDECAR_INTERFACE));
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
                                    QUACK_SIZE, MSG_DONTWAIT);
             if (n_bytes_quacked > 0) {
                 LAST_QUACK[n_bytes_quacked] = '\0';
-                printf("New quack: '%s' (recieved %lu maincar bytes)\n", LAST_QUACK, BYTES_GOTTEN);
+                printf("New quack: '%s'\n", LAST_QUACK);
             } else if (n_bytes_quacked < 0 && errno != EAGAIN) {
                 perror("Error getting quack:");
                 exit(1);
@@ -97,53 +98,75 @@ int main(int argc, char **argv) {
         }
         curl_multi_perform(multi_handle, &n_transfers_running);
     } while (n_transfers_running);
-    printf("Transfers done! %lu bytes\n", BYTES_GOTTEN);
+    if (WRITE_AFTER)
+        ourWriteOut(WRITE_AFTER, easy_handle, CURLE_OK);
     return 0;
 }
 
 void usage() {
-    fprintf(stderr, "Usage: %s [URL] [path/to/post/body/file]\n", BINARY_NAME);
-    fprintf(stderr, "Optional flags:\n");
-    fprintf(stderr, "--quiche-cc    [reno|cubic|bbr]\n");
-    fprintf(stderr, "--sidecar      [interface]\n");
-    fprintf(stderr, "--threshold    [sidecar threshold]\n");
-    fprintf(stderr, "HTTP3 is enabled exactly when --quiche-cc is specified\n");
-    fprintf(stderr, "Result data is counted but ignored.\n");
-    fprintf(stderr, "(--insecure is enabled automatically.)\n");
+    fprintf(stderr, "Usage: %s <args> [URL]\n", BINARY_NAME);
+    fprintf(stderr, "Options:\n"
+"-o, --output <file>         write to <file> instead of stdout\n"
+"-1, --http1.1               tell curl to use HTTP v1.1\n"
+"-3, --http3                 tell curl to use HTTP v3\n"
+"-q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]\n"
+"-s, --sidecar <iface>       tell quiche to use <iface> as the sidecar iface\n"
+"-t, --threshold <number>    specify the sidecar threshold\n"
+"-w, --write-out <format>    format string for display on stdout afterwards\n"
+"-d, --data-binary @<file>   send the contents of @<file> as an HTTP POST\n"
+"                            NOTE: only @<file> supported currently, not <str>\n"
+"-k, --insecure              tell curl not to attempt to validate peer signatures\n"
+"-m, --max-time <secs>       timeout the operation after this many seconds\n");
     exit(1);
 }
 void parseargs(int argc, char **argv) {
     if (argc == 0) usage();
 
     struct option options[] = {
+        // GENERIC CURL OPTIONS
+        {"output",      required_argument, 0, 'o'},
+        {"write-out",   required_argument, 0, 'w'},
+        {"data-binary", required_argument, 0, 'd'},
+        {"max-time",    required_argument, 0, 'm'},
+        {"insecure",    no_argument,       0, 'k'},
+        {"http1.1",     no_argument,       0, '1'},
+        {"http3",       no_argument,       0, '3'},
+        // SIDECAR-SPECIFIC OPTIONS
         {"quiche-cc",   required_argument, 0, 'q'},
         {"sidecar",     required_argument, 0, 's'},
         {"threshold",   required_argument, 0, 't'},
         {0, 0, 0, 0},
     };
     while (1) {
-        int c = getopt_long(argc, argv, "", options, NULL);
+        int c = getopt_long(argc, argv, "o:w:d:m:k13q:s:t:", options, NULL);
         if (c == -1) break;
         switch (c) {
-        case 'q':
-            QUICHE_CC = strdup(optarg);
+        case 'o':
+            OUTPUT_FILE = fopen(optarg, "w");
+            if (!OUTPUT_FILE) {
+                printf("Error opening output file '%s'\n", optarg);
+                perror("Error Message:");
+            }
             break;
-        case 's':
-            SIDECAR_INTERFACE = strdup(optarg);
+        case 'd':
+            assert(optarg[0] == '@');
+            BODY_INPUT_FILE = fopen(optarg + 1, "r");
+            if (!BODY_INPUT_FILE) {
+                printf("Error opening POST body file '%s'\n", argv[optind]);
+                perror("Error Message:");
+            }
             break;
-        case 't':
-            SIDECAR_THRESHOLD = atoi(optarg);
-            break;
-        case '?':
-            exit(1);
-            break;
+        case 'w': WRITE_AFTER = strdup(optarg); break;
+        case 'm': TIMEOUT_SECS = atof(optarg); break;
+        case 'k': INSECURE = 1; break;
+        case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
+        case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
+        case 'q': QUICHE_CC = strdup(optarg); break;
+        case 's': SIDECAR_INTERFACE = strdup(optarg); break;
+        case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
+        case '?': usage();
         }
     }
-    if ((optind + 2) != argc) usage();
-    BODY_INPUT_FILE = fopen(argv[optind], "r");
-    if (!BODY_INPUT_FILE) {
-        printf("Error opening POST body file '%s'\n", argv[optind]);
-        perror("Error Message:");
-    }
-    URL = argv[optind + 1];
+    if ((optind + 1) != argc) usage();
+    URL = argv[optind];
 }

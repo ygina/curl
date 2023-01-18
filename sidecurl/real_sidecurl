@@ -1,2 +1,2 @@
 #!/bin/bash
-LD_LIBRARY_PATH="$PWD/../buildtarget/lib:$LD_LIBRARY_PATH" ./sidecurl $@
+LD_LIBRARY_PATH="$PWD/../lib/.libs:$LD_LIBRARY_PATH" ./sidecurl "$@"
