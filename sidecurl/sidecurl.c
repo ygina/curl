@@ -20,7 +20,7 @@ static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int SIDECAR_THRESHOLD, INSECURE;
-static long HTTP_VERSION = CURL_HTTP_VERSION_2_0;
+static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
 void ourWriteOut(const char *writeinfo, CURL *easy, CURLcode per_result);
