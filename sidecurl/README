@@ -15,7 +15,7 @@ Send quacks repeatedly
 $ watch -n1 ./send_quack.sh 'quack.quack'
 
 In a separate shell, run sidecurl, e.g., on a long download:
-$ ./real_sidecurl https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-desktop-amd64.iso -o /dev/null
+$ ./wrapped_sidecurl https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-desktop-amd64.iso -o /dev/null
 New quack: 'quack.quack' (recieved 0 maincar bytes)
 New quack: 'quack.quack' (recieved 311296 maincar bytes)
 New quack: 'quack.quack' (recieved 13238272 maincar bytes)
