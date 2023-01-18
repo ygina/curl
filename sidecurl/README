@@ -16,7 +16,7 @@ Send quacks repeatedly
 $ watch -n1 ./send_quack.sh 'quack.quack'
 
 In a separate shell, run sidecurl, e.g., on a long download:
-$ ./real_sidecurl https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-desktop-amd64.iso /dev/null
+$ ./real_sidecurl /dev/null https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-desktop-amd64.iso
 New quack: 'quack.quack' (recieved 0 maincar bytes)
 New quack: 'quack.quack' (recieved 311296 maincar bytes)
 New quack: 'quack.quack' (recieved 13238272 maincar bytes)
@@ -24,11 +24,11 @@ New quack: 'quack.quack' (recieved 32866304 maincar bytes)
 ...
 
 Note that sidecurl always does a POST; the data for the POST is passed via a
-file with path given by the second unnamed argument (/dev/null in this case).
+file with path given by the first unnamed argument (/dev/null in this case).
 
 ------- HTTP3/QUIC Options
 QUIC/HTTP3 is enabled by passing --quiche-cc:
-$ ./real_sidecurl --quiche-cc cubic https://google.com/ /dev/null
+$ ./real_sidecurl --quiche-cc cubic /dev/null https://google.com/
 quiche_conn_new_with_tls cubic (nil) 0
 Transfers done! 1589 bytes
 

@@ -140,10 +140,10 @@ void parseargs(int argc, char **argv) {
         }
     }
     if ((optind + 2) != argc) usage();
-    URL = argv[optind];
-    BODY_INPUT_FILE = fopen(argv[optind + 1], "r");
+    BODY_INPUT_FILE = fopen(argv[optind], "r");
     if (!BODY_INPUT_FILE) {
-        printf("Error opening POST body file '%s'\n", argv[optind + 1]);
+        printf("Error opening POST body file '%s'\n", argv[optind]);
         perror("Error Message:");
     }
+    URL = argv[optind + 1];
 }
