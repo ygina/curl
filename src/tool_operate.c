@@ -2275,8 +2275,6 @@ static CURLcode add_parallel_transfers(struct GlobalConfig *global,
   return CURLE_OK;
 }
 
-#define QUACK_SIZE 2048
-static char LAST_QUACK[2 * QUACK_SIZE]; /* 2x for good luck */
 static CURLcode parallel_transfers(struct GlobalConfig *global,
                                    CURLSH *share)
 {
@@ -2292,14 +2290,6 @@ static CURLcode parallel_transfers(struct GlobalConfig *global,
   /* wrapitup_processed is set TRUE after the per transfer abort flag is set */
   bool wrapitup_processed = FALSE;
   time_t tick = time(NULL);
-  int sidecar_socket = socket(AF_INET, SOCK_DGRAM, 0);
-  ssize_t n_bytes_quacked;
-  struct sockaddr_in addr;
-  addr.sin_family = AF_INET;
-  addr.sin_port = htons(5103);
-  addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  if(bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)))
-      exit(1);
 
   multi = curl_multi_init();
   if(!multi)
@@ -2328,21 +2318,9 @@ static CURLcode parallel_transfers(struct GlobalConfig *global,
       }
     }
 
-    mcode = curl_multi_poll(multi, NULL, 0, 100, NULL);
+    mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
     if(!mcode)
       mcode = curl_multi_perform(multi, &still_running);
-    /* check for quacks */
-    n_bytes_quacked = recv(sidecar_socket, LAST_QUACK,
-                           QUACK_SIZE, MSG_DONTWAIT);
-    if(n_bytes_quacked > 0) {
-      LAST_QUACK[n_bytes_quacked] = '\0';
-      printf("Got a quack! %s", LAST_QUACK);
-    }
-    else if(n_bytes_quacked < 0 && errno != EAGAIN) {
-      perror("Hi:");
-      printf("Got an error ....\n");
-      exit(1);
-    }
 
     progress_meter(global, &start, FALSE);
 

@@ -656,8 +656,6 @@ static CURLcode easy_transfer(struct Curl_multi *multi)
   while(!done && !mcode) {
     int still_running = 0;
 
-    /* TODO(masot): for serial mode, this is probably where we want to drop the
-     * quack checks */
     mcode = curl_multi_poll(multi, NULL, 0, 1000, NULL);
 
     if(!mcode)
