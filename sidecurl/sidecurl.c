@@ -10,10 +10,18 @@
 #include <time.h>
 #include "curl/curl.h"
 
-#define checkok(x) do { assert((x) == CURLE_OK); } while (0)
+#define checkok(x) do { \
+    CURLcode err = (x); \
+    if (err != CURLE_OK) { \
+        fprintf(stderr, "CURL Error on line %d: %s\n", __LINE__, ERROR_BUFFER); \
+        exit(1); \
+    } \
+} while (0)
 
 #define QUACK_SIZE 2048
 static char LAST_QUACK[2 * QUACK_SIZE]; /* 2x for good luck */
+
+char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
 static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
@@ -40,6 +48,7 @@ int main(int argc, char **argv) {
     /*** OPEN A CURL HANDLE ***/
     CURL *easy_handle = curl_easy_init();
     // Set cURL options
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_ERRORBUFFER, ERROR_BUFFER));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_URL, URL));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTP_VERSION, HTTP_VERSION));
     if (TIMEOUT_SECS > 0.)

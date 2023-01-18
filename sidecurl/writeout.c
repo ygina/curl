@@ -34,6 +34,7 @@
         fprintf(stderr, "sidecurl doesn't support '%s'...yet...complain to Matthew\n", option); \
         exit(1); \
     } while(0)
+extern char ERROR_BUFFER[CURL_ERROR_SIZE]; // sidecurl.c
 
 typedef enum {
   VAR_NONE,       /* must be the first */
@@ -257,7 +258,10 @@ static int writeString(FILE *stream, const struct writeoutvar *wovar,
   else {
     switch(wovar->id) {
     case VAR_ERRORMSG:
-        unsupported("%{errormsg}");
+        if (ERROR_BUFFER[0]) {
+            strinfo = ERROR_BUFFER;
+            valid = 1;
+        }
       // if(per_result) {
       //   strinfo = (per->errorbuffer && per->errorbuffer[0]) ?
       //     per->errorbuffer : curl_easy_strerror(per_result);
