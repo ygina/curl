@@ -321,13 +321,22 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   if(rv == -1)
     return CURLE_QUIC_CONNECT_ERROR;
 
-  printf("quiche_conn_new_with_tls %s %s %d\n",
-    conn->quiche_cc, conn->sidecar_iface, conn->sidecar_threshold);
-  qs->conn = quiche_conn_new_with_tls((const uint8_t *) qs->scid,
-                                      sizeof(qs->scid), NULL, 0,
-                                      (struct sockaddr *)&qs->local_addr,
-                                      qs->local_addrlen, addr, addrlen,
-                                      qs->cfg, qs->ssl, false);
+  if (conn->sidecar_iface) {
+    qs->conn = quiche_conn_new_with_sc_tls(conn->sidecar_iface,
+                                           conn->sidecar_threshold,
+                                           (const uint8_t *) qs->scid,
+                                           sizeof(qs->scid), NULL, 0,
+                                           (struct sockaddr *)&qs->local_addr,
+                                           qs->local_addrlen, addr, addrlen,
+                                           qs->cfg, qs->ssl, false);
+  } else {
+    qs->conn = quiche_conn_new_with_tls((const uint8_t *) qs->scid,
+                                        sizeof(qs->scid), NULL, 0,
+                                        (struct sockaddr *)&qs->local_addr,
+                                        qs->local_addrlen, addr, addrlen,
+                                        qs->cfg, qs->ssl, false);
+  }
+
   if(!qs->conn) {
     failf(data, "can't create quiche connection");
     return CURLE_OUT_OF_MEMORY;
