@@ -27,7 +27,7 @@ static char *BINARY_NAME = "sidecurl";
 static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
-static int SIDECAR_THRESHOLD, INSECURE;
+static int SIDECAR_THRESHOLD, INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
@@ -64,6 +64,7 @@ int main(int argc, char **argv) {
         checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 0L));
         checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 0L));
     }
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_INTERFACE, SIDECAR_INTERFACE));
@@ -74,7 +75,7 @@ int main(int argc, char **argv) {
 
     struct timeval timeout;
     timeout.tv_sec = 0;
-    timeout.tv_usec = 100;
+    timeout.tv_usec = 1000;
 
     fd_set fdread, fdwrite, fdexcep;
     int n_transfers_running;
@@ -149,6 +150,7 @@ void parseargs(int argc, char **argv) {
         {"insecure",    no_argument,       0, 'k'},
         {"http1.1",     no_argument,       0, '1'},
         {"http3",       no_argument,       0, '3'},
+        {"verbose",     no_argument,       0, 'v'},
         // SIDECAR-SPECIFIC OPTIONS
         {"quiche-cc",   required_argument, 0, 'q'},
         {"sidecar",     required_argument, 0, 's'},
@@ -177,6 +179,7 @@ void parseargs(int argc, char **argv) {
         case 'w': WRITE_AFTER = strdup(optarg); break;
         case 'm': TIMEOUT_SECS = atof(optarg); break;
         case 'k': INSECURE = 1; break;
+        case 'v': VERBOSE = 1; break;
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
         case 'q': QUICHE_CC = strdup(optarg); break;
