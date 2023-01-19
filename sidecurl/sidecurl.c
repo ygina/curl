@@ -161,7 +161,7 @@ void parseargs(int argc, char **argv) {
             assert(optarg[0] == '@');
             BODY_INPUT_FILE = fopen(optarg + 1, "r");
             if (!BODY_INPUT_FILE) {
-                printf("Error opening POST body file '%s'\n", argv[optind]);
+                printf("Error opening POST body file '%s'\n", optarg + 1);
                 perror("Error Message:");
             }
             break;
