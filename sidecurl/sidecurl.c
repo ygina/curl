@@ -60,8 +60,10 @@ int main(int argc, char **argv) {
     }
     if (OUTPUT_FILE)
         checkok(curl_easy_setopt(easy_handle, CURLOPT_WRITEDATA, OUTPUT_FILE));
-    if (INSECURE)
+    if (INSECURE) {
         checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYPEER, 0L));
+        checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 0L));
+    }
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_INTERFACE, SIDECAR_INTERFACE));
