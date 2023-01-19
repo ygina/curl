@@ -538,6 +538,16 @@ static CURLcode getinfo_slist(struct Curl_easy *data, CURLINFO info,
 #endif
     }
     break;
+#ifdef USE_QUICHE
+  case CURLINFO_QUICHE_CONN:
+    {
+      quiche_conn **qcp = (quiche_conn **)param_slistp;
+      struct quicsocket *qs = data->conn->quic;
+      if(qs)
+          *qcp = qs->conn;
+    }
+    break;
+#endif
   default:
     return CURLE_UNKNOWN_OPTION;
   }

@@ -32,6 +32,7 @@ static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
 void ourWriteOut(const char *writeinfo, CURL *easy, CURLcode per_result);
+void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len);
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
@@ -102,7 +103,10 @@ int main(int argc, char **argv) {
                                    QUACK_SIZE, MSG_DONTWAIT);
             if (n_bytes_quacked > 0) {
                 LAST_QUACK[n_bytes_quacked] = '\0';
-                printf("New quack: '%s'\n", LAST_QUACK);
+                void *conn = NULL;
+                checkok(curl_easy_getinfo(easy_handle, CURLINFO_QUICHE_CONN, &conn));
+                // printf("New quack: '%s'\n", LAST_QUACK);
+                quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked);
             } else if (n_bytes_quacked < 0 && errno != EAGAIN) {
                 perror("Error getting quack:");
                 exit(1);
