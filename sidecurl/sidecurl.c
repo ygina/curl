@@ -89,8 +89,8 @@ int main(int argc, char **argv) {
         int maxfd = -1;
         while (maxfd == -1) {
             checkok(curl_multi_fdset(multi_handle, &fdread, &fdwrite, &fdexcep, &maxfd));
-            if (maxfd == -1)
-                curl_multi_perform(multi_handle, &n_transfers_running);
+            if (maxfd != -1) break;
+            curl_multi_perform(multi_handle, &n_transfers_running);
         }
         // Then add ours
         assert(sidecar_socket < FD_SETSIZE);
@@ -114,6 +114,7 @@ int main(int argc, char **argv) {
         }
         curl_multi_perform(multi_handle, &n_transfers_running);
     } while (n_transfers_running);
+
     if (WRITE_AFTER) {
         int msgq = 0;
         CURLMsg *msg = curl_multi_info_read(multi_handle, &msgq);
@@ -123,6 +124,7 @@ int main(int argc, char **argv) {
         } else fprintf(stderr, "Weird result from multi_info_read...\n");
         ourWriteOut(WRITE_AFTER, easy_handle, result);
     }
+
     return 0;
 }
 

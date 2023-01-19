@@ -4,6 +4,7 @@ QUICHE_LIB_DIR = $(PWD)/../../quiche/target/release
 CFLAGS += -I../include
 CFLAGS += -Wno-deprecated-declarations
 CFLAGS += -g
+CFLAGS += -O3
 
 # Link curl
 CFLAGS += -L$(CURL_LIB_DIR)
