@@ -109,8 +109,15 @@ int main(int argc, char **argv) {
         }
         curl_multi_perform(multi_handle, &n_transfers_running);
     } while (n_transfers_running);
-    if (WRITE_AFTER)
-        ourWriteOut(WRITE_AFTER, easy_handle, CURLE_OK);
+    if (WRITE_AFTER) {
+        int msgq = 0;
+        CURLMsg *msg = curl_multi_info_read(multi_handle, &msgq);
+        CURLcode result = CURLE_OK;
+        if (msgq == 0) {
+            result = msg->data.result;
+        } else fprintf(stderr, "Weird result from multi_info_read...\n");
+        ourWriteOut(WRITE_AFTER, easy_handle, result);
+    }
     return 0;
 }
 
