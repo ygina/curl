@@ -158,7 +158,7 @@ void parseargs(int argc, char **argv) {
         {0, 0, 0, 0},
     };
     while (1) {
-        int c = getopt_long(argc, argv, "o:w:d:m:k13q:s:t:", options, NULL);
+        int c = getopt_long(argc, argv, "o:w:d:m:k13vq:s:t:", options, NULL);
         if (c == -1) break;
         switch (c) {
         case 'o':
