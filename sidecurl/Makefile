@@ -1,6 +1,3 @@
-LD = ld
-CC = gcc
-
 CURL_LIB_DIR = $(PWD)/../lib/.libs
 QUICHE_LIB_DIR = $(PWD)/../../quiche/target/release
 
