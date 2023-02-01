@@ -57,7 +57,7 @@
 #endif
 
 #define QUIC_MAX_STREAMS (256*1024)
-#define QUIC_MAX_DATA (1*1024*1024)
+#define QUIC_MAX_DATA (1*1024*1024*1000)
 #define QUIC_IDLE_TIMEOUT (60 * 1000) /* milliseconds */
 #define QUIC_MAX_SEND_UDP_PAYLOAD_SIZE 1460
 
