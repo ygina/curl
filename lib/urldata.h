@@ -920,6 +920,7 @@ struct connectdata {
   char *sidecar_iface;
   size_t sidecar_threshold;
   bool quack_reset;
+  bool sidecar_mtu;
   struct quicsocket hequic[2]; /* two, for happy eyeballs! */
   struct quicsocket *quic;
 #endif
@@ -1622,6 +1623,7 @@ struct UserDefined {
   char *sidecar_iface;    /* sidecar interface to listen on */
   long sidecar_threshold; /* sidecar quACK threshold number of packets */
   bool quack_reset;       /* whether to send quack reset messages */
+  bool sidecar_mtu;       /* send packets only if the cwnd > mtu */
   FILE *err;         /* the stderr user data goes here */
   void *debugdata;   /* the data that will be passed to fdebug */
   char *errorbuffer; /* (Static) store failure messages in here */

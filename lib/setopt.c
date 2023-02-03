@@ -3133,6 +3133,9 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_QUACK_RESET:
     data->set.quack_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
+  case CURLOPT_SIDECAR_MTU:
+    data->set.sidecar_mtu = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
 #endif
 
   default:

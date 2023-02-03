@@ -312,6 +312,11 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   } else {
     quiche_config_enable_quack_reset(qs->cfg, FALSE);
   }
+  if(conn->sidecar_mtu) {
+    quiche_config_enable_sidecar_mtu(qs->cfg, TRUE);
+  } else {
+    quiche_config_enable_sidecar_mtu(qs->cfg, FALSE);
+  }
 
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)

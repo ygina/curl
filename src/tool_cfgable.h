@@ -48,6 +48,7 @@ struct OperationConfig {
   char *sidecar_iface;
   long sidecar_threshold;
   bool quack_reset;
+  bool sidecar_mtu;
   char *quiche_cc;
   bool remote_time;
   char *useragent;

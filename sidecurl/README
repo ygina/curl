@@ -33,6 +33,7 @@ compatible with curl
 -3, --http3                 tell curl to use HTTP v3
 -q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]
 -Q, --quack-reset           whether to send quack reset messages
+-S, --sidecar-mtu           send packets only if the cwnd > mtu
 -s, --sidecar <iface>       tell quiche to use <iface> as the sidecar iface
 -t, --threshold <number>    specify the sidecar threshold
 -w, --write-out <format>    format string for display on stdout afterwards

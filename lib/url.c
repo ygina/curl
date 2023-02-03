@@ -1554,6 +1554,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
   conn->sidecar_iface = data->set.sidecar_iface;
   conn->sidecar_threshold = data->set.sidecar_threshold;
   conn->quack_reset = data->set.quack_reset;
+  conn->sidecar_mtu = data->set.sidecar_mtu;
 #endif
 
   conn->sock[FIRSTSOCKET] = CURL_SOCKET_BAD;     /* no file descriptor */

@@ -108,6 +108,7 @@ static const struct LongShort aliases[]= {
 #ifdef USE_WATT32
   {"*p", "wdebug",                   ARG_BOOL},
 #endif
+  {"*P", "sidecar-mtu",              ARG_BOOL},
   {"*q", "ftp-create-dirs",          ARG_BOOL},
   {"*Q", "quiche-cc",                ARG_STRING},
   {"*r", "create-dirs",              ARG_BOOL},
@@ -985,6 +986,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         dbug_init();
         break;
 #endif
+      case 'P': /* --sidecar-mtu */
+        config->sidecar_mtu = TRUE;
+        break;
+
       case 'q': /* --ftp-create-dirs */
         config->ftp_create_dirs = toggle;
         break;
