@@ -1,5 +1,5 @@
-CURL_LIB_DIR = $(PWD)/../lib/.libs
-QUICHE_LIB_DIR = $(PWD)/../../quiche/target/release
+CURL_LIB_DIR = $(HOME)/curl/lib/.libs
+QUICHE_LIB_DIR = $(HOME)/quiche-sidecar/target/release
 
 CFLAGS += -I../include
 CFLAGS += -Wno-deprecated-declarations
