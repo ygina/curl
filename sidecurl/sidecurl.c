@@ -32,7 +32,8 @@ static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
 void ourWriteOut(const char *writeinfo, CURL *easy, CURLcode per_result);
-void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len);
+void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len,
+    const struct sockaddr *addr, size_t addr_len);
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
@@ -80,6 +81,8 @@ int main(int argc, char **argv) {
 
     fd_set fdread, fdwrite, fdexcep;
     int n_transfers_running;
+    struct sockaddr from_addr;
+    socklen_t from_addr_len;
     do {
         /*** FILE DESCRIPTORS ***/
         FD_ZERO(&fdread);
@@ -99,14 +102,16 @@ int main(int argc, char **argv) {
         /*** SELECT ***/
         select(maxfd + 2, &fdread, &fdwrite, &fdexcep, &timeout);
         if (FD_ISSET(sidecar_socket, &fdread)) {
-            n_bytes_quacked = recv(sidecar_socket, LAST_QUACK,
-                                   QUACK_SIZE, MSG_DONTWAIT);
+            n_bytes_quacked = recvfrom(sidecar_socket, LAST_QUACK,
+                                       QUACK_SIZE, MSG_DONTWAIT,
+                                       &from_addr, &from_addr_len);
             if (n_bytes_quacked > 0) {
                 LAST_QUACK[n_bytes_quacked] = '\0';
                 void *conn = NULL;
                 checkok(curl_easy_getinfo(easy_handle, CURLINFO_QUICHE_CONN, &conn));
                 // printf("New quack: '%s'\n", LAST_QUACK);
-                quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked);
+                quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked,
+                    &from_addr, from_addr_len);
             } else if (n_bytes_quacked < 0 && errno != EAGAIN) {
                 perror("Error getting quack:");
                 exit(1);
