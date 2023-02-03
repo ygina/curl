@@ -117,6 +117,7 @@ static const struct LongShort aliases[]= {
   {"*t", "proxy-ntlm",               ARG_BOOL},
   {"*T", "threshold",                ARG_STRING},
   {"*u", "crlf",                     ARG_BOOL},
+  {"*U", "quack-reset",              ARG_BOOL},
   {"*v", "stderr",                   ARG_FILENAME},
   {"*V", "aws-sigv4",                ARG_STRING},
   {"*w", "interface",                ARG_STRING},
@@ -1031,6 +1032,10 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       case 'u': /* --crlf */
         /* LF -> CRLF conversion? */
         config->crlf = toggle;
+        break;
+
+      case 'U': /* --quack-reset */
+        config->quack_reset = TRUE;
         break;
 
       case 'V': /* --aws-sigv4 */

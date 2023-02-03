@@ -27,7 +27,7 @@ static char *BINARY_NAME = "sidecurl";
 static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
-static int SIDECAR_THRESHOLD, INSECURE, VERBOSE;
+static int SIDECAR_THRESHOLD, QUACK_RESET, INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_INTERFACE, SIDECAR_INTERFACE));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_THRESHOLD, SIDECAR_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_QUACK_RESET, QUACK_RESET));
 
     CURLM *multi_handle = curl_multi_init();
     checkok(curl_multi_add_handle(multi_handle, easy_handle));
@@ -140,6 +141,7 @@ void usage() {
 "-1, --http1.1               tell curl to use HTTP v1.1\n"
 "-3, --http3                 tell curl to use HTTP v3\n"
 "-q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]\n"
+"-Q, --quack-reset           whether to send quack reset messages\n"
 "-s, --sidecar <iface>       tell quiche to use <iface> as the sidecar iface\n"
 "-t, --threshold <number>    specify the sidecar threshold\n"
 "-w, --write-out <format>    format string for display on stdout afterwards\n"
@@ -166,6 +168,7 @@ void parseargs(int argc, char **argv) {
         {"quiche-cc",   required_argument, 0, 'q'},
         {"sidecar",     required_argument, 0, 's'},
         {"threshold",   required_argument, 0, 't'},
+        {"quack-reset", no_argument,       0, 'Q'},
         {0, 0, 0, 0},
     };
     while (1) {
@@ -196,6 +199,7 @@ void parseargs(int argc, char **argv) {
         case 'q': QUICHE_CC = strdup(optarg); break;
         case 's': SIDECAR_INTERFACE = strdup(optarg); break;
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
+        case 'Q': QUACK_RESET = 1; break;
         case '?': usage();
         }
     }

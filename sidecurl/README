@@ -32,6 +32,7 @@ compatible with curl
 -1, --http1.1               tell curl to use HTTP v1.1
 -3, --http3                 tell curl to use HTTP v3
 -q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]
+-Q, --quack-reset           whether to send quack reset messages
 -s, --sidecar <iface>       tell quiche to use <iface> as the sidecar iface
 -t, --threshold <number>    specify the sidecar threshold
 -w, --write-out <format>    format string for display on stdout afterwards

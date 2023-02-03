@@ -307,6 +307,11 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     quiche_config_set_sidecar_iface(qs->cfg, conn->sidecar_iface);
     quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
   }
+  if(conn->quack_reset) {
+    quiche_config_enable_quack_reset(qs->cfg, TRUE);
+  } else {
+    quiche_config_enable_quack_reset(qs->cfg, FALSE);
+  }
 
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)
