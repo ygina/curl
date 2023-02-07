@@ -37,15 +37,19 @@ void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
+    int use_sidecar = SIDECAR_THRESHOLD > 0;
 
     /*** OPEN A SIDECAR SOCKET ***/
     ssize_t n_bytes_quacked;
-    int sidecar_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(5103);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    assert(!bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)));
+    int sidecar_socket;
+    if (use_sidecar) {
+        sidecar_socket = socket(AF_INET, SOCK_DGRAM, 0);
+        struct sockaddr_in addr;
+        addr.sin_family = AF_INET;
+        addr.sin_port = htons(5103);
+        addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        assert(!bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)));
+    }
 
     /*** OPEN A CURL HANDLE ***/
     CURL *easy_handle = curl_easy_init();
@@ -98,8 +102,10 @@ int main(int argc, char **argv) {
             curl_multi_perform(multi_handle, &n_transfers_running);
         }
         // Then add ours
-        assert(sidecar_socket < FD_SETSIZE);
-        FD_SET(sidecar_socket, &fdread);
+        if (use_sidecar) {
+            assert(sidecar_socket < FD_SETSIZE);
+            FD_SET(sidecar_socket, &fdread);
+        }
 
         /*** SELECT ***/
         select(maxfd + 2, &fdread, &fdwrite, &fdexcep, &timeout);
