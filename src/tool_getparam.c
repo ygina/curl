@@ -114,7 +114,6 @@ static const struct LongShort aliases[]= {
   {"*r", "create-dirs",              ARG_BOOL},
   {"*R", "create-file-mode",         ARG_STRING},
   {"*s", "max-redirs",               ARG_STRING},
-  {"*S", "sidecar",                  ARG_STRING},
   {"*t", "proxy-ntlm",               ARG_BOOL},
   {"*T", "threshold",                ARG_STRING},
   {"*u", "crlf",                     ARG_BOOL},
@@ -1016,10 +1015,6 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           return err;
         if(config->maxredirs < -1)
           return PARAM_BAD_NUMERIC;
-        break;
-
-      case 'S': /* --sidecar */
-        GetStr(&config->sidecar_iface, nextarg);
         break;
 
       case 't': /* --proxy-ntlm */

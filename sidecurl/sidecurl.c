@@ -24,10 +24,10 @@ static char LAST_QUACK[2 * QUACK_SIZE]; /* 2x for good luck */
 char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
-static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_INTERFACE;
+static char *URL, *WRITE_AFTER, *QUICHE_CC;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
-static int SIDECAR_THRESHOLD, QUACK_RESET, SIDECAR_MTU, INSECURE, VERBOSE;
+static int SIDECAR_THRESHOLD, SIDECAR_QUACK_RESET, SIDECAR_MTU, INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
@@ -73,9 +73,8 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_INTERFACE, SIDECAR_INTERFACE));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_THRESHOLD, SIDECAR_THRESHOLD));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_QUACK_RESET, QUACK_RESET));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_RESET, SIDECAR_QUACK_RESET));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
 
     CURLM *multi_handle = curl_multi_init();
@@ -150,7 +149,6 @@ void usage() {
 "-q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]\n"
 "-Q, --quack-reset           whether to send quack reset messages\n"
 "-S, --sidecar-mtu           send packets only if the cwnd > mtu\n"
-"-s, --sidecar <iface>       tell quiche to use <iface> as the sidecar iface\n"
 "-t, --threshold <number>    specify the sidecar threshold\n"
 "-w, --write-out <format>    format string for display on stdout afterwards\n"
 "-d, --data-binary @<file>   send the contents of @<file> as an HTTP POST\n"
@@ -206,9 +204,8 @@ void parseargs(int argc, char **argv) {
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
         case 'q': QUICHE_CC = strdup(optarg); break;
-        case 's': SIDECAR_INTERFACE = strdup(optarg); break;
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
-        case 'Q': QUACK_RESET = 1; break;
+        case 'Q': SIDECAR_QUACK_RESET = 1; break;
         case 'S': SIDECAR_MTU = 1; break;
         case '?': usage();
         }

@@ -947,9 +947,8 @@ static CURLcode single_transfer(struct GlobalConfig *global,
 #ifdef USE_QUICHE
         /* TODO(masot): Who knows where this should really go lol */
         my_setopt(curl, CURLOPT_QUICHE_CC, config->quiche_cc);
-        my_setopt(curl, CURLOPT_SIDECAR_INTERFACE, config->sidecar_iface);
-        my_setopt(curl, CURLOPT_THRESHOLD, config->sidecar_threshold);
-        my_setopt(curl, CURLOPT_QUACK_RESET, config->quack_reset);
+        my_setopt(curl, CURLOPT_SIDECAR_THRESHOLD, config->sidecar_threshold);
+        my_setopt(curl, CURLOPT_SIDECAR_QUACK_RESET, config->quack_reset);
         my_setopt(curl, CURLOPT_SIDECAR_MTU, config->sidecar_mtu);
 #endif
         per->etag_save = etag_first; /* copy the whole struct */

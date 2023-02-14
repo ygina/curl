@@ -3124,13 +3124,10 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_QUICHE_CC:
     data->set.quiche_cc = va_arg(param, char *);
     break;
-  case CURLOPT_SIDECAR_INTERFACE:
-    data->set.sidecar_iface = va_arg(param, char *);
-    break;
-  case CURLOPT_THRESHOLD:
+  case CURLOPT_SIDECAR_THRESHOLD:
     data->set.sidecar_threshold = va_arg(param, long);
     break;
-  case CURLOPT_QUACK_RESET:
+  case CURLOPT_SIDECAR_QUACK_RESET:
     data->set.quack_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
   case CURLOPT_SIDECAR_MTU:

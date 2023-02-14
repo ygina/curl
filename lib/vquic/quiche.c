@@ -303,8 +303,7 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     if(strcmp(conn->quiche_cc, "bbr") == 0)
       quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_BBR);
   }
-  if(conn->sidecar_iface) {
-    quiche_config_set_sidecar_iface(qs->cfg, conn->sidecar_iface);
+  if(conn->sidecar_threshold > 0) {
     quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
   }
   if(conn->quack_reset) {
@@ -340,7 +339,6 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                       (struct sockaddr *)&qs->local_addr,
                                       qs->local_addrlen, addr, addrlen,
                                       qs->cfg, qs->ssl, false);
-
   if(!qs->conn) {
     failf(data, "can't create quiche connection");
     return CURLE_OUT_OF_MEMORY;

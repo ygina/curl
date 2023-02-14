@@ -45,7 +45,6 @@ struct State {
 };
 
 struct OperationConfig {
-  char *sidecar_iface;
   long sidecar_threshold;
   bool quack_reset;
   bool sidecar_mtu;

@@ -917,7 +917,6 @@ struct connectdata {
 
 #ifdef ENABLE_QUIC
   char *quiche_cc;
-  char *sidecar_iface;
   size_t sidecar_threshold;
   bool quack_reset;
   bool sidecar_mtu;
@@ -1620,7 +1619,6 @@ typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
   char *quiche_cc;        /* HTTP/3 quiche congestion control algorithm */
-  char *sidecar_iface;    /* sidecar interface to listen on */
   long sidecar_threshold; /* sidecar quACK threshold number of packets */
   bool quack_reset;       /* whether to send quack reset messages */
   bool sidecar_mtu;       /* send packets only if the cwnd > mtu */
