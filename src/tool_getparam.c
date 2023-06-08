@@ -114,6 +114,7 @@ static const struct LongShort aliases[]= {
   {"*r", "create-dirs",              ARG_BOOL},
   {"*R", "create-file-mode",         ARG_STRING},
   {"*s", "max-redirs",               ARG_STRING},
+  {"*S", "min-ack-delay",            ARG_STRING},
   {"*t", "proxy-ntlm",               ARG_BOOL},
   {"*T", "threshold",                ARG_STRING},
   {"*u", "crlf",                     ARG_BOOL},
@@ -121,6 +122,7 @@ static const struct LongShort aliases[]= {
   {"*v", "stderr",                   ARG_FILENAME},
   {"*V", "aws-sigv4",                ARG_STRING},
   {"*w", "interface",                ARG_STRING},
+  {"*W", "max-ack-delay",            ARG_STRING},
   {"*x", "krb",                      ARG_STRING},
   {"*x", "krb4",                     ARG_STRING},
          /* 'krb4' is the previous name */
@@ -1017,6 +1019,12 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
           return PARAM_BAD_NUMERIC;
         break;
 
+      case 'S': /* --min-ack-delay */
+        err = str2num(&config->min_ack_delay, nextarg);
+        if(err)
+          return err;
+        break;
+
       case 't': /* --proxy-ntlm */
         if(!feature_ntlm)
           return PARAM_LIBCURL_DOESNT_SUPPORT;
@@ -1061,6 +1069,11 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
       case 'w': /* --interface */
         /* interface */
         GetStr(&config->iface, nextarg);
+        break;
+      case 'W': /* --max-ack-delay */
+        err = str2num(&config->max_ack_delay, nextarg);
+        if(err)
+          return err;
         break;
       case 'x': /* --krb */
         /* kerberos level string */

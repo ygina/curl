@@ -3133,6 +3133,12 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_SIDECAR_MTU:
     data->set.sidecar_mtu = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
+  case CURLOPT_QUICHE_MIN_ACK_DELAY:
+    data->set.min_ack_delay = va_arg(param, long);
+    break;
+  case CURLOPT_QUICHE_MAX_ACK_DELAY:
+    data->set.max_ack_delay = va_arg(param, long);
+    break;
 #endif
 
   default:

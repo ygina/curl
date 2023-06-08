@@ -49,6 +49,8 @@ struct OperationConfig {
   bool quack_reset;
   bool sidecar_mtu;
   char *quiche_cc;
+  long min_ack_delay;
+  long max_ack_delay;
   bool remote_time;
   char *useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */

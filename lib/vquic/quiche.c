@@ -306,6 +306,12 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   if(conn->sidecar_threshold > 0) {
     quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
   }
+  if(conn->min_ack_delay > 0) {
+    quiche_config_set_min_ack_delay(qs->cfg, conn->min_ack_delay);
+  }
+  if(conn->max_ack_delay > 0) {
+    quiche_config_set_max_ack_delay(qs->cfg, conn->max_ack_delay);
+  }
   if(conn->quack_reset) {
     quiche_config_enable_quack_reset(qs->cfg, TRUE);
   } else {
