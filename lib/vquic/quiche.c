@@ -576,6 +576,7 @@ static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
 
   /* time until the next timeout event, as nanoseconds. */
   timeout_ns = quiche_conn_timeout_as_nanos(qs->conn);
+  // TODO(ygina): still correct if the timeout is 0? the timer would expire now
   if(timeout_ns)
     /* expire uses milliseconds */
     Curl_expire(data, (timeout_ns + 999999) / 1000000, EXPIRE_QUIC);
