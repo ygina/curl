@@ -126,8 +126,9 @@ int main(int argc, char **argv) {
                 perror("Error getting quack:");
                 exit(1);
             }
+        } else {
+            curl_multi_perform(multi_handle, &n_transfers_running);
         }
-        curl_multi_perform(multi_handle, &n_transfers_running);
     } while (n_transfers_running);
 
     if (WRITE_AFTER) {
