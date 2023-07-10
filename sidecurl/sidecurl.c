@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
         /*** SELECT ***/
         select(maxfd + 2, &fdread, &fdwrite, &fdexcep, &timeout);
         if (use_sidecar && FD_ISSET(sidecar_socket, &fdread)) {
+            from_addr_len = sizeof(from_addr);
             n_bytes_quacked = recvfrom(sidecar_socket, LAST_QUACK,
                                        QUACK_SIZE, MSG_DONTWAIT,
                                        &from_addr, &from_addr_len);
