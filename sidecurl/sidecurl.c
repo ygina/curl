@@ -123,6 +123,9 @@ int main(int argc, char **argv) {
                 // printf("New quack: '%s'\n", LAST_QUACK);
                 quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked,
                     &from_addr, from_addr_len);
+
+                if (multi_handle)
+                    curl_multi_quic_flush_egress(multi_handle);
             } else if (n_bytes_quacked < 0 && errno != EAGAIN) {
                 perror("Error getting quack:");
                 exit(1);

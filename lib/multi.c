@@ -50,6 +50,7 @@
 #include "http2.h"
 #include "socketpair.h"
 #include "socks.h"
+#include "quic.h"
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
 #include "curl_memory.h"
@@ -450,6 +451,18 @@ struct Curl_multi *Curl_multi_handle(int hashsize, /* socket hash */
 
   free(multi);
   return NULL;
+}
+
+CURLMcode curl_multi_quic_flush_egress(struct Curl_multi *multi) {
+  struct Curl_easy *data = multi->easyp;
+  while(data) {
+    if (Curl_quic_flush_egress(data)) {
+      perror("Error in curl_multi_quic_flush_egress");
+      exit(1);
+    }
+    data = data->next;
+  }
+  return CURLM_OK;
 }
 
 struct Curl_multi *curl_multi_init(void)

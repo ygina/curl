@@ -122,6 +122,15 @@ struct curl_waitfd {
 };
 
 /*
+ * Name:    curl_multi_quic_flush_egress()
+ *
+ * Desc:    Flush egress buffer after sending a quack.
+ *
+ * Returns: CURLMcode type, general multi error code.
+ */
+CURL_EXTERN CURLMcode curl_multi_quic_flush_egress(CURLM *multi_handle);
+
+/*
  * Name:    curl_multi_init()
  *
  * Desc:    initialize multi-style curl usage

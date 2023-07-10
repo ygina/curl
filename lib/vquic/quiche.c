@@ -920,4 +920,17 @@ CURLcode Curl_quic_idle(struct Curl_easy *data)
   return CURLE_OK;
 }
 
+/*
+ * Flush egress in case all data is in the buffer and we need to send after
+ * packets have been quacked.
+ */
+CURLcode Curl_quic_flush_egress(struct Curl_easy *data)
+{
+  struct connectdata *conn = data->conn;
+  struct quicsocket *qs = conn->quic;
+  if (qs && flush_egress(data, qs->sockfd, qs))
+    return CURLE_SEND_ERROR;
+  return CURLE_OK;
+}
+
 #endif

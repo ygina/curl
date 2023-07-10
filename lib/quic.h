@@ -57,6 +57,7 @@ bool Curl_quic_data_pending(const struct Curl_easy *data);
 void Curl_quic_disconnect(struct Curl_easy *data,
                           struct connectdata *conn, int tempindex);
 CURLcode Curl_quic_idle(struct Curl_easy *data);
+CURLcode Curl_quic_flush_egress(struct Curl_easy *data);
 
 #else /* ENABLE_QUIC */
 #define Curl_quic_done_sending(x)
