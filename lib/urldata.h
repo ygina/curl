@@ -919,6 +919,7 @@ struct connectdata {
   char *quiche_cc;
   size_t sidecar_threshold;
   bool quack_reset;
+  char *quack_style;
   bool sidecar_mtu;
   size_t min_ack_delay;
   size_t max_ack_delay;
@@ -1623,6 +1624,7 @@ struct UserDefined {
   char *quiche_cc;        /* HTTP/3 quiche congestion control algorithm */
   long sidecar_threshold; /* sidecar quACK threshold number of packets */
   bool quack_reset;       /* whether to send quack reset messages */
+  char *quack_style;      /* style of quack to send/receive */
   bool sidecar_mtu;       /* send packets only if the cwnd > mtu */
   long min_ack_delay;     /* min delay between acks, in ms */
   long max_ack_delay;     /* max delay between acks, in ms */

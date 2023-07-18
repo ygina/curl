@@ -1553,6 +1553,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
   conn->quiche_cc = data->set.quiche_cc;
   conn->sidecar_threshold = data->set.sidecar_threshold;
   conn->quack_reset = data->set.quack_reset;
+  conn->quack_style = data->set.quack_style;
   conn->sidecar_mtu = data->set.sidecar_mtu;
   conn->min_ack_delay = data->set.min_ack_delay;
   conn->max_ack_delay = data->set.max_ack_delay;

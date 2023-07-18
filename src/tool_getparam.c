@@ -128,6 +128,7 @@ static const struct LongShort aliases[]= {
          /* 'krb4' is the previous name */
   {"*X", "haproxy-protocol",         ARG_BOOL},
   {"*y", "max-filesize",             ARG_STRING},
+  {"*Y", "quack-style",              ARG_STRING},
   {"*z", "disable-eprt",             ARG_BOOL},
   {"*Z", "eprt",                     ARG_BOOL},
          /* 'eprt' made like this to make --no-eprt and --eprt to work
@@ -1094,6 +1095,9 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
              return pe;
           config->max_filesize = value;
         }
+        break;
+      case 'Y': /* --quack-style */
+        GetStr(&config->quack_style, nextarg);
         break;
       case 'z': /* --disable-eprt */
         config->disable_eprt = toggle;

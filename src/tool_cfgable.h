@@ -51,6 +51,7 @@ struct OperationConfig {
   char *quiche_cc;
   long min_ack_delay;
   long max_ack_delay;
+  char *quack_style;
   bool remote_time;
   char *useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */

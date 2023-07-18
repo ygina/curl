@@ -24,7 +24,7 @@ static char LAST_QUACK[2 * QUACK_SIZE]; /* 2x for good luck */
 char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
-static char *URL, *WRITE_AFTER, *QUICHE_CC;
+static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_QUACK_STYLE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY;
@@ -77,6 +77,7 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_RESET, SIDECAR_QUACK_RESET));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_STYLE, SIDECAR_QUACK_STYLE));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MIN_ACK_DELAY, QUICHE_MIN_ACK_DELAY));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MAX_ACK_DELAY, QUICHE_MAX_ACK_DELAY));
 
@@ -156,6 +157,7 @@ void usage() {
 "-3, --http3                 tell curl to use HTTP v3\n"
 "-q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]\n"
 "-Q, --quack-reset           whether to send quack reset messages\n"
+"-u, --quack-style           style of quack to send/receive\n"
 "-S, --sidecar-mtu           send packets only if the cwnd > mtu\n"
 "-t, --threshold <number>    specify the sidecar threshold\n"
 "-M, --min-ack-delay         minimum delay between acks, in ms\n"
@@ -188,6 +190,7 @@ void parseargs(int argc, char **argv) {
         {"sidecar-mtu", no_argument,       0, 'S'},
         {"min-ack-delay", required_argument, 0, 'M'},
         {"max-ack-delay", required_argument, 0, 'D'},
+        {"quack-style",   required_argument, 0, 'u'},
         {0, 0, 0, 0},
     };
     while (1) {
@@ -219,6 +222,7 @@ void parseargs(int argc, char **argv) {
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
         case 'Q': SIDECAR_QUACK_RESET = 1; break;
         case 'S': SIDECAR_MTU = 1; break;
+        case 'u': SIDECAR_QUACK_STYLE = strdup(optarg); break;
         case 'M': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
         case 'D': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
         case '?': usage();

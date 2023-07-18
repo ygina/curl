@@ -322,6 +322,16 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   } else {
     quiche_config_enable_sidecar_mtu(qs->cfg, FALSE);
   }
+  if(conn->quack_style) {
+    if(strcmp(conn->quack_style, "power_sum") == 0)
+      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
+    if(strcmp(conn->quack_style, "strawman_a") == 0)
+      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_A);
+    if(strcmp(conn->quack_style, "strawman_b") == 0)
+      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_B);
+    if(strcmp(conn->quack_style, "strawman_c") == 0)
+      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_C);
+  }
 
   qs->sslctx = quic_ssl_ctx(data);
   if(!qs->sslctx)
