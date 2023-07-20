@@ -1,3 +1,23 @@
+---- tcpsidecurl
+build & run:
+
+    $ make
+    $ ./tcpsidecurl https://old-releases.ubuntu.com/releases/22.04.1/ubuntu-22.04.1-desktop-amd64.iso -t 1 -o /dev/null
+
+in another shell:
+
+    $ nc 127.0.0.1 5103
+    type type type
+    type type type
+    type type type
+
+caveats with current implementation:
+
+    - tcpsidecurl won't start doing anything (including the underlying curl
+      work) until it makes a tcp connection on the sidecar socket
+    - if the sidecar socket disconnects, tcpsidecurl will spin trying to read
+      from it
+
 ---- sidecurl
 ------- building cURL & sidecurl
 Build libcurl
@@ -12,10 +32,10 @@ $ make
 
 ------- using sidecurl
 Send quacks repeatedly
-$ watch -n1 ./send_quack.sh 'quack.quack'
+$ watch -n1 ./send_quack.sh
 
 In a separate shell, run sidecurl, e.g., on a long download:
-$ ./wrapped_sidecurl https://releases.ubuntu.com/22.04.1/ubuntu-22.04.1-desktop-amd64.iso -o /dev/null
+$ ./sidecurl https://old-releases.ubuntu.com/releases/22.04.1/ubuntu-22.04.1-desktop-amd64.iso -t 1 -o /dev/null
 New quack: 'quack.quack' (recieved 0 maincar bytes)
 New quack: 'quack.quack' (recieved 311296 maincar bytes)
 New quack: 'quack.quack' (recieved 13238272 maincar bytes)

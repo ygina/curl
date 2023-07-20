@@ -1,4 +1,3 @@
-SIDECAR_HOME = $(HOME)/sidecar
 CURL_LIB_DIR = $(SIDECAR_HOME)/curl/lib/.libs
 QUICHE_LIB_DIR = $(SIDECAR_HOME)/quiche/target/release
 
@@ -17,5 +16,12 @@ CFLAGS += -L$(QUICHE_LIB_DIR)
 CFLAGS += -Xlinker "-rpath=$(QUICHE_LIB_DIR)"
 CFLAGS += -lquiche
 
+all: sidecurl tcpsidecurl
+
 sidecurl: sidecurl.c writeout.c
 	$(CC) $^ $(CFLAGS) -o $@
+
+tcpsidecurl: tcpsidecurl.c writeout.c
+	$(CC) $^ $(CFLAGS) -o $@
+
+.PHONY: all
