@@ -1,3 +1,4 @@
+SIDECAR_HOME = /home/gina/sidecar
 CURL_LIB_DIR = $(SIDECAR_HOME)/curl/lib/.libs
 QUICHE_LIB_DIR = $(SIDECAR_HOME)/quiche/target/release
 
