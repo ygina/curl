@@ -122,7 +122,6 @@ int main(int argc, char **argv) {
                 n_bytes_in_buffer += n_bytes_quacked;
                 if (n_bytes_in_buffer != QUACK_SIZE) continue;
 
-                LAST_QUACK[n_bytes_in_buffer] = '\0';
                 void *conn = NULL;
                 checkok(curl_easy_getinfo(easy_handle, CURLINFO_QUICHE_CONN, &conn));
                 // printf("New quack: '%s'\n", LAST_QUACK);
