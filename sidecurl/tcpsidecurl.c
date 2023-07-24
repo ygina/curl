@@ -18,7 +18,7 @@
     } \
 } while (0)
 
-#define QUACK_SIZE 8
+#define QUACK_SIZE 4
 static char LAST_QUACK[4 * QUACK_SIZE]; /* 4x for good luck */
 
 char ERROR_BUFFER[CURL_ERROR_SIZE];
