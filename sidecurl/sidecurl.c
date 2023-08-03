@@ -25,6 +25,7 @@ char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
 static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_QUACK_STYLE;
+static struct curl_slist *HEADERS = NULL;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY;
@@ -72,6 +73,7 @@ int main(int argc, char **argv) {
         checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 0L));
     }
     checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTPHEADER, HEADERS));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
@@ -146,6 +148,9 @@ int main(int argc, char **argv) {
         ourWriteOut(WRITE_AFTER, easy_handle, result);
     }
 
+    if (HEADERS) {
+        curl_slist_free_all(HEADERS);
+    }
     return 0;
 }
 
@@ -162,6 +167,7 @@ void usage() {
 "-t, --threshold <number>    specify the sidecar threshold\n"
 "-M, --min-ack-delay         minimum delay between acks, in ms\n"
 "-D, --max-ack-delay         maximum delay between acks, in ms\n"
+"    --header header         extra header to include in information sent\n"
 "-w, --write-out <format>    format string for display on stdout afterwards\n"
 "-d, --data-binary @<file>   send the contents of @<file> as an HTTP POST\n"
 "                            NOTE: only @<file> supported currently, not <str>\n"
@@ -182,6 +188,7 @@ void parseargs(int argc, char **argv) {
         {"http1.1",     no_argument,       0, '1'},
         {"http3",       no_argument,       0, '3'},
         {"verbose",     no_argument,       0, 'v'},
+        {"header",      required_argument, 0, 'H'},
         // SIDECAR-SPECIFIC OPTIONS
         {"quiche-cc",   required_argument, 0, 'q'},
         {"sidecar",     required_argument, 0, 's'},
@@ -194,7 +201,7 @@ void parseargs(int argc, char **argv) {
         {0, 0, 0, 0},
     };
     while (1) {
-        int c = getopt_long(argc, argv, "o:w:d:m:k13vq:s:t:", options, NULL);
+        int c = getopt_long(argc, argv, "o:w:d:m:k:1:3:v:H:q:s:t:Q:S:M:D", options, NULL);
         if (c == -1) break;
         switch (c) {
         case 'o':
@@ -213,6 +220,7 @@ void parseargs(int argc, char **argv) {
             }
             break;
         case 'w': WRITE_AFTER = strdup(optarg); break;
+        case 'H': HEADERS = curl_slist_append(HEADERS, strdup(optarg)); break;
         case 'm': TIMEOUT_SECS = atof(optarg); break;
         case 'k': INSECURE = 1; break;
         case 'v': VERBOSE = 1; break;
