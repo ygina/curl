@@ -562,24 +562,28 @@ static CURLcode process_ingress(struct Curl_easy *data, int sockfd,
 static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
                              struct quicsocket *qs)
 {
+  ssize_t quiche_sent;
   ssize_t sent;
   uint8_t out[QUIC_MAX_SEND_UDP_PAYLOAD_SIZE];
   int64_t timeout_ns;
   quiche_send_info send_info;
 
   do {
-    sent = quiche_conn_send(qs->conn, out, sizeof(out), &send_info);
-    if(sent == QUICHE_ERR_DONE)
+    quiche_sent = quiche_conn_send(qs->conn, out, sizeof(out), &send_info);
+    if(quiche_sent == QUICHE_ERR_DONE)
       break;
 
-    if(sent < 0) {
-      failf(data, "quiche_conn_send returned %zd", sent);
+    if(quiche_sent < 0) {
+      failf(data, "quiche_conn_send returned %zd", quiche_sent);
       return CURLE_SEND_ERROR;
     }
 
-    sent = send(sockfd, out, sent, 0);
+    do {
+      sent = send(sockfd, out, quiche_sent, 0);
+    } while(sent < 0 && errno == 11);
+    //sent = send(sockfd, out, quiche_sent, 0);
     if(sent < 0) {
-      failf(data, "send() returned %zd", sent);
+      failf(data, "send() returned %zd %zd %s", sent, errno, strerror(errno));
       return CURLE_SEND_ERROR;
     }
   } while(1);
