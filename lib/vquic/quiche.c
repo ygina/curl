@@ -580,10 +580,10 @@ static CURLcode flush_egress(struct Curl_easy *data, int sockfd,
 
     do {
       sent = send(sockfd, out, quiche_sent, 0);
-    } while(sent < 0 && errno == 11);
+    } while(sent < 0 && (SOCKERRNO == EAGAIN || SOCKERRNO == EWOULDBLOCK));
     //sent = send(sockfd, out, quiche_sent, 0);
     if(sent < 0) {
-      failf(data, "send() returned %zd %zd %s", sent, errno, strerror(errno));
+      failf(data, "send() returned %zd %zd %s", sent, SOCKERRNO, strerror(SOCKERRNO));
       return CURLE_SEND_ERROR;
     }
   } while(1);
