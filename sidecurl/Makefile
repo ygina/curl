@@ -1,6 +1,6 @@
-SIDECAR_HOME = /home/gina/sidecar
-CURL_LIB_DIR = $(SIDECAR_HOME)/curl/lib/.libs
-QUICHE_LIB_DIR = $(SIDECAR_HOME)/quiche/target/release
+SIDECAR_HOME = $(HOME)/sidecar
+CURL_LIB_DIR = $(SIDECAR_HOME)/http3_integration/curl/lib/.libs
+QUICHE_LIB_DIR = $(SIDECAR_HOME)/http3_integration/quiche/target/release
 
 CFLAGS += -I../include
 CFLAGS += -Wno-deprecated-declarations
