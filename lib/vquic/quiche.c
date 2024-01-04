@@ -295,34 +295,28 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                        QUICHE_H3_APPLICATION_PROTOCOL,
                                        sizeof(QUICHE_H3_APPLICATION_PROTOCOL)
                                        - 1);
+
+  // additional non-sidecar options
+  quiche_config_enable_sidecar_mtu(qs->cfg, conn->sidecar_mtu);
+  if(conn->min_ack_delay > 0)
+    quiche_config_set_min_ack_delay(qs->cfg, conn->min_ack_delay);
+  if(conn->max_ack_delay > 0)
+    quiche_config_set_max_ack_delay(qs->cfg, conn->max_ack_delay);
+
+  // sidecar options
   if(conn->sidecar_threshold > 0) {
     quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
-  }
-  if(conn->min_ack_delay > 0) {
-    quiche_config_set_min_ack_delay(qs->cfg, conn->min_ack_delay);
-  }
-  if(conn->max_ack_delay > 0) {
-    quiche_config_set_max_ack_delay(qs->cfg, conn->max_ack_delay);
-  }
-  if(conn->quack_reset) {
-    quiche_config_enable_quack_reset(qs->cfg, TRUE);
-  } else {
-    quiche_config_enable_quack_reset(qs->cfg, FALSE);
-  }
-  if(conn->sidecar_mtu) {
-    quiche_config_enable_sidecar_mtu(qs->cfg, TRUE);
-  } else {
-    quiche_config_enable_sidecar_mtu(qs->cfg, FALSE);
-  }
-  if(conn->quack_style) {
-    if(strcmp(conn->quack_style, "power_sum") == 0)
-      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
-    if(strcmp(conn->quack_style, "strawman_a") == 0)
-      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_A);
-    if(strcmp(conn->quack_style, "strawman_b") == 0)
-      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_B);
-    if(strcmp(conn->quack_style, "strawman_c") == 0)
-      quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_C);
+    quiche_config_enable_quack_reset(qs->cfg, conn->quack_reset);
+    if(conn->quack_style) {
+      if(strcmp(conn->quack_style, "power_sum") == 0)
+        quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
+      if(strcmp(conn->quack_style, "strawman_a") == 0)
+        quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_A);
+      if(strcmp(conn->quack_style, "strawman_b") == 0)
+        quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_B);
+      if(strcmp(conn->quack_style, "strawman_c") == 0)
+        quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_C);
+    }
   }
 
   qs->sslctx = quic_ssl_ctx(data);
