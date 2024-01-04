@@ -23,10 +23,6 @@
  ***************************************************************************/
 #include "tool_setup.h"
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/udp.h>
 #ifdef HAVE_FCNTL_H
 #  include <fcntl.h>
 #endif
@@ -944,15 +940,6 @@ static CURLcode single_transfer(struct GlobalConfig *global,
             fclose(etag_save->stream);
           break;
         }
-#ifdef USE_QUICHE
-        /* TODO(masot): Who knows where this should really go lol */
-        my_setopt(curl, CURLOPT_SIDECAR_THRESHOLD, config->sidecar_threshold);
-        my_setopt(curl, CURLOPT_SIDECAR_QUACK_RESET, config->quack_reset);
-        my_setopt(curl, CURLOPT_SIDECAR_MTU, config->sidecar_mtu);
-        my_setopt(curl, CURLOPT_SIDECAR_QUACK_STYLE, config->quack_style);
-        my_setopt(curl, CURLOPT_QUICHE_MIN_ACK_DELAY, config->min_ack_delay);
-        my_setopt(curl, CURLOPT_QUICHE_MAX_ACK_DELAY, config->max_ack_delay);
-#endif
         per->etag_save = etag_first; /* copy the whole struct */
         if(state->uploadfile) {
           per->uploadfile = strdup(state->uploadfile);

@@ -108,16 +108,13 @@ static const struct LongShort aliases[]= {
 #ifdef USE_WATT32
   {"*p", "wdebug",                   ARG_BOOL},
 #endif
-  {"*P", "sidecar-mtu",              ARG_BOOL},
   {"*q", "ftp-create-dirs",          ARG_BOOL},
   {"*r", "create-dirs",              ARG_BOOL},
   {"*R", "create-file-mode",         ARG_STRING},
   {"*s", "max-redirs",               ARG_STRING},
   {"*S", "min-ack-delay",            ARG_STRING},
   {"*t", "proxy-ntlm",               ARG_BOOL},
-  {"*T", "threshold",                ARG_STRING},
   {"*u", "crlf",                     ARG_BOOL},
-  {"*U", "quack-reset",              ARG_BOOL},
   {"*v", "stderr",                   ARG_FILENAME},
   {"*V", "aws-sigv4",                ARG_STRING},
   {"*w", "interface",                ARG_STRING},
@@ -127,7 +124,6 @@ static const struct LongShort aliases[]= {
          /* 'krb4' is the previous name */
   {"*X", "haproxy-protocol",         ARG_BOOL},
   {"*y", "max-filesize",             ARG_STRING},
-  {"*Y", "quack-style",              ARG_STRING},
   {"*z", "disable-eprt",             ARG_BOOL},
   {"*Z", "eprt",                     ARG_BOOL},
          /* 'eprt' made like this to make --no-eprt and --eprt to work
@@ -987,10 +983,6 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         dbug_init();
         break;
 #endif
-      case 'P': /* --sidecar-mtu */
-        config->sidecar_mtu = TRUE;
-        break;
-
       case 'q': /* --ftp-create-dirs */
         config->ftp_create_dirs = toggle;
         break;
@@ -1027,19 +1019,9 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
         config->proxyntlm = toggle;
         break;
 
-      case 'T': /* --threshold */
-        err = str2num(&config->sidecar_threshold, nextarg);
-        if(err)
-          return err;
-        break;
-
       case 'u': /* --crlf */
         /* LF -> CRLF conversion? */
         config->crlf = toggle;
-        break;
-
-      case 'U': /* --quack-reset */
-        config->quack_reset = TRUE;
         break;
 
       case 'V': /* --aws-sigv4 */
@@ -1090,9 +1072,6 @@ ParameterError getparameter(const char *flag, /* f or -long-flag */
              return pe;
           config->max_filesize = value;
         }
-        break;
-      case 'Y': /* --quack-style */
-        GetStr(&config->quack_style, nextarg);
         break;
       case 'z': /* --disable-eprt */
         config->disable_eprt = toggle;
