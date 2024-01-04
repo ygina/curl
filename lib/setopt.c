@@ -3121,9 +3121,6 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     break;
 
 #ifdef USE_QUICHE
-  case CURLOPT_QUICHE_CC:
-    data->set.quiche_cc = va_arg(param, char *);
-    break;
   case CURLOPT_SIDECAR_THRESHOLD:
     data->set.sidecar_threshold = va_arg(param, long);
     break;

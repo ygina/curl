@@ -1550,7 +1550,6 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
   /* and we setup a few fields in case we end up actually using this struct */
 
 #ifdef ENABLE_QUIC
-  conn->quiche_cc = data->set.quiche_cc;
   conn->sidecar_threshold = data->set.sidecar_threshold;
   conn->quack_reset = data->set.quack_reset;
   conn->quack_style = data->set.quack_style;

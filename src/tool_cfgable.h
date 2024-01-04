@@ -48,7 +48,6 @@ struct OperationConfig {
   long sidecar_threshold;
   bool quack_reset;
   bool sidecar_mtu;
-  char *quiche_cc;
   long min_ack_delay;
   long max_ack_delay;
   char *quack_style;

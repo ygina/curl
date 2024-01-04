@@ -916,7 +916,6 @@ struct connectdata {
   struct Curl_addrinfo *tempaddr[2]; /* for happy eyeballs */
 
 #ifdef ENABLE_QUIC
-  char *quiche_cc;
   size_t sidecar_threshold;
   bool quack_reset;
   char *quack_style;
@@ -1621,7 +1620,6 @@ enum dupblob {
 typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
-  char *quiche_cc;        /* HTTP/3 quiche congestion control algorithm */
   long sidecar_threshold; /* sidecar quACK threshold number of packets */
   bool quack_reset;       /* whether to send quack reset messages */
   char *quack_style;      /* style of quack to send/receive */

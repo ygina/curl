@@ -24,7 +24,7 @@ static char LAST_QUACK[4 * QUACK_SIZE]; /* 4x for good luck */
 char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
-static char *URL, *WRITE_AFTER, *QUICHE_CC, *SIDECAR_QUACK_STYLE;
+static char *URL, *WRITE_AFTER, *SIDECAR_QUACK_STYLE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY;
@@ -77,7 +77,6 @@ int main(int argc, char **argv) {
     }
     checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
     // Set sidecar options
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CC, QUICHE_CC));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_RESET, SIDECAR_QUACK_RESET));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
@@ -160,7 +159,6 @@ void usage() {
 "-o, --output <file>         write to <file> instead of stdout\n"
 "-1, --http1.1               tell curl to use HTTP v1.1\n"
 "-3, --http3                 tell curl to use HTTP v3\n"
-"-q, --quiche-cc <alg>       tell quiche to use [cubic|reno|bbr]\n"
 "-Q, --quack-reset           whether to send quack reset messages\n"
 "-u, --quack-style           style of quack to send/receive\n"
 "-S, --sidecar-mtu           send packets only if the cwnd > mtu\n"
@@ -188,7 +186,6 @@ void parseargs(int argc, char **argv) {
         {"http3",       no_argument,       0, '3'},
         {"verbose",     no_argument,       0, 'v'},
         // SIDECAR-SPECIFIC OPTIONS
-        {"quiche-cc",   required_argument, 0, 'q'},
         {"sidecar",     required_argument, 0, 's'},
         {"threshold",   required_argument, 0, 't'},
         {"quack-reset", no_argument,       0, 'Q'},
@@ -223,7 +220,6 @@ void parseargs(int argc, char **argv) {
         case 'v': VERBOSE = 1; break;
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
-        case 'q': QUICHE_CC = strdup(optarg); break;
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
         case 'Q': SIDECAR_QUACK_RESET = 1; break;
         case 'S': SIDECAR_MTU = 1; break;

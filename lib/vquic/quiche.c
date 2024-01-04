@@ -295,14 +295,6 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                        QUICHE_H3_APPLICATION_PROTOCOL,
                                        sizeof(QUICHE_H3_APPLICATION_PROTOCOL)
                                        - 1);
-  if(conn->quiche_cc) {
-    if(strcmp(conn->quiche_cc, "reno") == 0)
-      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_RENO);
-    if(strcmp(conn->quiche_cc, "cubic") == 0)
-      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_CUBIC);
-    if(strcmp(conn->quiche_cc, "bbr") == 0)
-      quiche_config_set_cc_algorithm(qs->cfg, QUICHE_CC_BBR);
-  }
   if(conn->sidecar_threshold > 0) {
     quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
   }
