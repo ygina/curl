@@ -28,7 +28,7 @@ static char *URL, *WRITE_AFTER, *SIDECAR_QUACK_STYLE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY;
-static int SIDECAR_THRESHOLD, SIDECAR_QUACK_RESET, SIDECAR_MTU, INSECURE, VERBOSE;
+static int SIDECAR_THRESHOLD, SIDECAR_QUACK_RESET, SIDECAR_MTU = 1, INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
@@ -161,7 +161,7 @@ void usage() {
 "-3, --http3                 tell curl to use HTTP v3\n"
 "-Q, --quack-reset           whether to send quack reset messages\n"
 "-u, --quack-style           style of quack to send/receive\n"
-"-S, --sidecar-mtu           send packets only if the cwnd > mtu\n"
+"    --disable-mtu-fix       disable fix that sends packets only if the cwnd > mtu\n"
 "-t, --threshold <number>    specify the sidecar threshold\n"
 "-M, --min-ack-delay         minimum delay between acks, in ms\n"
 "-D, --max-ack-delay         maximum delay between acks, in ms\n"
@@ -189,7 +189,7 @@ void parseargs(int argc, char **argv) {
         {"sidecar",     required_argument, 0, 's'},
         {"threshold",   required_argument, 0, 't'},
         {"quack-reset", no_argument,       0, 'Q'},
-        {"sidecar-mtu", no_argument,       0, 'S'},
+        {"disable-mtu-fix", no_argument,   0, 'S'},
         {"min-ack-delay", required_argument, 0, 'M'},
         {"max-ack-delay", required_argument, 0, 'D'},
         {"quack-style",   required_argument, 0, 'u'},
@@ -222,7 +222,7 @@ void parseargs(int argc, char **argv) {
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
         case 'Q': SIDECAR_QUACK_RESET = 1; break;
-        case 'S': SIDECAR_MTU = 1; break;
+        case 'S': SIDECAR_MTU = 0; break;
         case 'u': SIDECAR_QUACK_STYLE = strdup(optarg); break;
         case 'M': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
         case 'D': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
