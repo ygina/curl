@@ -1551,8 +1551,8 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
 
 #ifdef ENABLE_QUIC
   conn->sidecar_threshold = data->set.sidecar_threshold;
-  conn->quack_reset = data->set.quack_reset;
-  conn->quack_style = data->set.quack_style;
+  conn->sidecar_reset = data->set.sidecar_reset;
+  conn->sidecar_quack_style = data->set.sidecar_quack_style;
   conn->sidecar_mtu = data->set.sidecar_mtu;
   conn->min_ack_delay = data->set.min_ack_delay;
   conn->max_ack_delay = data->set.max_ack_delay;

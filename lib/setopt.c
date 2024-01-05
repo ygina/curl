@@ -3124,8 +3124,11 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_SIDECAR_THRESHOLD:
     data->set.sidecar_threshold = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_QUACK_RESET:
-    data->set.quack_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
+  case CURLOPT_SIDECAR_RESET:
+    data->set.sidecar_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
+  case CURLOPT_SIDECAR_QUACK_STYLE:
+    data->set.sidecar_quack_style = va_arg(param, char *);
     break;
   case CURLOPT_SIDECAR_MTU:
     data->set.sidecar_mtu = (0 != va_arg(param, long)) ? TRUE : FALSE;
@@ -3135,9 +3138,6 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     break;
   case CURLOPT_QUICHE_MAX_ACK_DELAY:
     data->set.max_ack_delay = va_arg(param, long);
-    break;
-  case CURLOPT_SIDECAR_QUACK_STYLE:
-    data->set.quack_style = va_arg(param, char *);
     break;
 #endif
 

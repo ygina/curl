@@ -46,11 +46,11 @@ struct State {
 
 struct OperationConfig {
   long sidecar_threshold;
-  bool quack_reset;
+  bool sidecar_reset;
+  char *sidecar_quack_style;
   bool sidecar_mtu;
   long min_ack_delay;
   long max_ack_delay;
-  char *quack_style;
   bool remote_time;
   char *useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */

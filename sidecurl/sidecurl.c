@@ -28,8 +28,10 @@ static char *URL, *WRITE_AFTER, *SIDECAR_QUACK_STYLE;
 static struct curl_slist *HEADERS = NULL;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
-static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY;
-static int SIDECAR_THRESHOLD, SIDECAR_QUACK_RESET, SIDECAR_MTU = 1, INSECURE, VERBOSE;
+static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY, SIDECAR_MTU = 1;
+static int SIDECAR_THRESHOLD;
+static int SIDECAR_RESET;
+static int INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
 static void parseargs(int argc, char **argv);
@@ -76,7 +78,7 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTPHEADER, HEADERS));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_RESET, SIDECAR_QUACK_RESET));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET, SIDECAR_RESET));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_STYLE, SIDECAR_QUACK_STYLE));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MIN_ACK_DELAY, QUICHE_MIN_ACK_DELAY));
@@ -224,7 +226,7 @@ void parseargs(int argc, char **argv) {
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
         case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
-        case 'Q': SIDECAR_QUACK_RESET = 1; break;
+        case 'Q': SIDECAR_RESET = 1; break;
         case 'S': SIDECAR_MTU = 0; break;
         case 'u': SIDECAR_QUACK_STYLE = strdup(optarg); break;
         case 'M': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;

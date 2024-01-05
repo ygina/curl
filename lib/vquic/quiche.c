@@ -306,15 +306,15 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
   // sidecar options
   if(conn->sidecar_threshold > 0) {
     quiche_config_sidecar_set_threshold(qs->cfg, conn->sidecar_threshold);
-    quiche_config_sidecar_enable_reset(qs->cfg, conn->quack_reset);
-    if(conn->quack_style) {
-      if(strcmp(conn->quack_style, "power_sum") == 0)
+    quiche_config_sidecar_enable_reset(qs->cfg, conn->sidecar_reset);
+    if(conn->sidecar_quack_style) {
+      if(strcmp(conn->sidecar_quack_style, "power_sum") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
-      if(strcmp(conn->quack_style, "strawman_a") == 0)
+      if(strcmp(conn->sidecar_quack_style, "strawman_a") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_A);
-      if(strcmp(conn->quack_style, "strawman_b") == 0)
+      if(strcmp(conn->sidecar_quack_style, "strawman_b") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_B);
-      if(strcmp(conn->quack_style, "strawman_c") == 0)
+      if(strcmp(conn->sidecar_quack_style, "strawman_c") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_C);
     }
   }
