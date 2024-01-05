@@ -29,8 +29,12 @@ static struct curl_slist *HEADERS = NULL;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
 static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY, SIDECAR_MTU = 1;
-static int SIDECAR_THRESHOLD;
-static int SIDECAR_RESET;
+static int SIDECAR_THRESHOLD, SIDECAR_MARK_ACKED = 0,
+           SIDECAR_MARK_LOST_AND_RETX = 1, SIDECAR_UPDATE_CWND = 1,
+           SIDECAR_NEAR_DELAY, SIDECAR_E2E_DELAY;
+static int SIDECAR_RESET = 1, SIDECAR_RESET_PORT,
+           SIDECAR_RESET_THRESHOLD;
+static int SIDECAR_REORDER_THRESHOLD;
 static int INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
@@ -78,9 +82,17 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_HTTPHEADER, HEADERS));
     // Set sidecar options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_ACKED, SIDECAR_MARK_ACKED));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_LOST_AND_RETX, SIDECAR_MARK_LOST_AND_RETX));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_UPDATE_CWND, SIDECAR_UPDATE_CWND));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_NEAR_DELAY, SIDECAR_NEAR_DELAY));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_E2E_DELAY, SIDECAR_E2E_DELAY));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET, SIDECAR_RESET));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET_PORT, SIDECAR_RESET_PORT));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET_THRESHOLD, SIDECAR_RESET_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_REORDER_THRESHOLD, SIDECAR_REORDER_THRESHOLD));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_STYLE, SIDECAR_QUACK_STYLE));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MIN_ACK_DELAY, QUICHE_MIN_ACK_DELAY));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MAX_ACK_DELAY, QUICHE_MAX_ACK_DELAY));
 
@@ -161,12 +173,20 @@ void usage() {
 "-o, --output <file>         write to <file> instead of stdout\n"
 "-1, --http1.1               tell curl to use HTTP v1.1\n"
 "-3, --http3                 tell curl to use HTTP v3\n"
-"-Q, --quack-reset           whether to send quack reset messages\n"
-"-u, --quack-style           style of quack to send/receive\n"
-"    --disable-mtu-fix       disable fix that sends packets only if the cwnd > mtu\n"
-"-t, --threshold <number>    specify the sidecar threshold\n"
-"-M, --min-ack-delay         minimum delay between acks, in ms\n"
-"-D, --max-ack-delay         maximum delay between acks, in ms\n"
+"    --sidecar <threshold>        enable the sidecar and set the power sum quACK threshold\n"
+"    --mark-acked <bool>          use quacks to consider packets received (default: 0)\n"
+"    --mark-lost-and-retx <bool>  use quacks to consider packets lost, and retransmit (default: 1)\n"
+"    --update-cwnd <bool>         use quacks to update the cwnd on loss (default: 1)\n"
+"    --near-delay <ms>            set the estimated delay between the sender and proxy, in ms (default: 1)\n"
+"    --e2e-delay <ms>             set the estimated delay between the proxy and receiver, in ms (default: 26)\n"
+"    --enable-reset <bool>        whether to send sidecar reset messages (default: 1)\n"
+"    --reset-port <port>          port to send sidecar reset messages to (default: 1234)\n"
+"    --reset-threshold <ms>       threshold that determines frequency of sidecar reset messages (default: 10)\n"
+"    --reorder-threshold <pkts>   threshold for sidecar loss detection (default: 3)\n"
+"-u, --quack-style <style>        style of quack to send/receive\n"
+"    --disable-mtu-fix            disable fix that sends packets only if the cwnd > mtu\n"
+"-M, --min-ack-delay <ms>         minimum delay between acks, in ms\n"
+"-D, --max-ack-delay <ms>         maximum delay between acks, in ms\n"
 "    --header header         extra header to include in information sent\n"
 "-w, --write-out <format>    format string for display on stdout afterwards\n"
 "-d, --data-binary @<file>   send the contents of @<file> as an HTTP POST\n"
@@ -190,13 +210,20 @@ void parseargs(int argc, char **argv) {
         {"verbose",     no_argument,       0, 'v'},
         {"header",      required_argument, 0, 'H'},
         // SIDECAR-SPECIFIC OPTIONS
-        {"sidecar",     required_argument, 0, 's'},
-        {"threshold",   required_argument, 0, 't'},
-        {"quack-reset", no_argument,       0, 'Q'},
-        {"disable-mtu-fix", no_argument,   0, 'S'},
-        {"min-ack-delay", required_argument, 0, 'M'},
-        {"max-ack-delay", required_argument, 0, 'D'},
-        {"quack-style",   required_argument, 0, 'u'},
+        {"sidecar",            required_argument, 0, 'a'},
+        {"mark-acked",         required_argument, 0, 'b'},
+        {"mark-lost-and-retx", required_argument, 0, 'c'},
+        {"update-cwnd",        required_argument, 0, 'e'},
+        {"near-delay",         required_argument, 0, 'f'},
+        {"e2e-delay",          required_argument, 0, 'g'},
+        {"enable-reset",       required_argument, 0, 'h'},
+        {"reset-port",         required_argument, 0, 'i'},
+        {"reset-threshold",    required_argument, 0, 'l'},
+        {"reorder-threshold",  required_argument, 0, 'n'},
+        {"quack-style",        required_argument, 0, 'p'},
+        {"disable-mtu-fix",    no_argument,       0, 'q'},
+        {"min-ack-delay",      required_argument, 0, 'r'},
+        {"max-ack-delay",      required_argument, 0, 's'},
         {0, 0, 0, 0},
     };
     while (1) {
@@ -219,18 +246,26 @@ void parseargs(int argc, char **argv) {
             }
             break;
         case 'w': WRITE_AFTER = strdup(optarg); break;
-        case 'H': HEADERS = curl_slist_append(HEADERS, strdup(optarg)); break;
         case 'm': TIMEOUT_SECS = atof(optarg); break;
         case 'k': INSECURE = 1; break;
-        case 'v': VERBOSE = 1; break;
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
-        case 't': SIDECAR_THRESHOLD = atoi(optarg); break;
-        case 'Q': SIDECAR_RESET = 1; break;
-        case 'S': SIDECAR_MTU = 0; break;
-        case 'u': SIDECAR_QUACK_STYLE = strdup(optarg); break;
-        case 'M': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
-        case 'D': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
+        case 'v': VERBOSE = 1; break;
+        case 'H': HEADERS = curl_slist_append(HEADERS, strdup(optarg)); break;
+        case 'a': SIDECAR_THRESHOLD = atoi(optarg); break;
+        case 'b': SIDECAR_MARK_ACKED = atoi(optarg); break;
+        case 'c': SIDECAR_MARK_LOST_AND_RETX = atoi(optarg); break;
+        case 'e': SIDECAR_UPDATE_CWND = atoi(optarg); break;
+        case 'f': SIDECAR_NEAR_DELAY = atoi(optarg); break;
+        case 'g': SIDECAR_E2E_DELAY = atoi(optarg); break;
+        case 'h': SIDECAR_RESET = atoi(optarg); break;
+        case 'i': SIDECAR_RESET_PORT = atoi(optarg); break;
+        case 'l': SIDECAR_RESET_THRESHOLD = atoi(optarg); break;
+        case 'n': SIDECAR_REORDER_THRESHOLD = atoi(optarg); break;
+        case 'p': SIDECAR_QUACK_STYLE = strdup(optarg); break;
+        case 'q': SIDECAR_MTU = 0; break;
+        case 'r': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
+        case 's': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
         case '?': usage();
         }
     }

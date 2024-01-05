@@ -917,7 +917,15 @@ struct connectdata {
 
 #ifdef ENABLE_QUIC
   size_t sidecar_threshold;
+  bool sidecar_mark_acked;
+  bool sidecar_mark_lost_and_retx;
+  bool sidecar_update_cwnd;
+  size_t sidecar_near_delay;
+  size_t sidecar_e2e_delay;
   bool sidecar_reset;
+  size_t sidecar_reset_port;
+  size_t sidecar_reset_threshold;
+  size_t sidecar_reorder_threshold;
   char *sidecar_quack_style;
   bool sidecar_mtu;
   size_t min_ack_delay;
@@ -1621,11 +1629,20 @@ typedef int (*multidone_func)(struct Curl_easy *easy, CURLcode result);
 
 struct UserDefined {
   long sidecar_threshold;           /* sidecar quACK threshold number of packets */
-  bool sidecar_reset;               /* whether to send quack reset messages */
+  bool sidecar_mark_acked;          /* use quacks to consider packets received */
+  bool sidecar_mark_lost_and_retx;  /* use quacks to consider packets lost, and retransmit */
+  bool sidecar_update_cwnd;         /* use quacks to update the cwnd on loss */
+  long sidecar_near_delay;          /* set the estimated delay between the sender and proxy, in ms */
+  long sidecar_e2e_delay;           /* set the estimated delay between the proxy and receiver, in ms */
+  bool sidecar_reset;               /* whether to send sidecar reset messages */
+  long sidecar_reset_port;          /* port to send sidecar reset messages to */
+  long sidecar_reset_threshold;     /* threshold that determines frequency of sidecar reset messages */
+  long sidecar_reorder_threshold;   /* threshold for sidecar loss detection */
   char *sidecar_quack_style;        /* style of quack to send/receive */
   bool sidecar_mtu;                 /* send packets only if the cwnd > mtu */
   long min_ack_delay;               /* min delay between acks, in ms */
   long max_ack_delay;               /* max delay between acks, in ms */
+
   FILE *err;         /* the stderr user data goes here */
   void *debugdata;   /* the data that will be passed to fdebug */
   char *errorbuffer; /* (Static) store failure messages in here */

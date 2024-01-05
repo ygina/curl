@@ -45,12 +45,23 @@ struct State {
 };
 
 struct OperationConfig {
+  /* sidecar options */
   long sidecar_threshold;
+  bool sidecar_mark_acked;
+  bool sidecar_mark_lost_and_retx;
+  bool sidecar_update_cwnd;
+  long sidecar_near_delay;
+  long sidecar_e2e_delay;
   bool sidecar_reset;
+  long sidecar_reset_port;
+  long sidecar_reset_threshold;
+  long sidecar_reorder_threshold;
   char *sidecar_quack_style;
   bool sidecar_mtu;
   long min_ack_delay;
   long max_ack_delay;
+
+  /* original options */
   bool remote_time;
   char *useragent;
   struct curl_slist *cookies;  /* cookies to serialize into a single line */

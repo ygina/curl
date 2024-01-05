@@ -3124,8 +3124,32 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_SIDECAR_THRESHOLD:
     data->set.sidecar_threshold = va_arg(param, long);
     break;
+  case CURLOPT_SIDECAR_MARK_ACKED:
+    data->set.sidecar_mark_acked = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
+  case CURLOPT_SIDECAR_MARK_LOST_AND_RETX:
+    data->set.sidecar_mark_lost_and_retx = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
+  case CURLOPT_SIDECAR_UPDATE_CWND:
+    data->set.sidecar_update_cwnd = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
+  case CURLOPT_SIDECAR_NEAR_DELAY:
+    data->set.sidecar_near_delay = va_arg(param, long);
+    break;
+  case CURLOPT_SIDECAR_E2E_DELAY:
+    data->set.sidecar_e2e_delay = va_arg(param, long);
+    break;
   case CURLOPT_SIDECAR_RESET:
     data->set.sidecar_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
+    break;
+  case CURLOPT_SIDECAR_RESET_PORT:
+    data->set.sidecar_reset_port = va_arg(param, long);
+    break;
+  case CURLOPT_SIDECAR_RESET_THRESHOLD:
+    data->set.sidecar_reset_threshold = va_arg(param, long);
+    break;
+  case CURLOPT_SIDECAR_REORDER_THRESHOLD:
+    data->set.sidecar_reorder_threshold = va_arg(param, long);
     break;
   case CURLOPT_SIDECAR_QUACK_STYLE:
     data->set.sidecar_quack_style = va_arg(param, char *);
