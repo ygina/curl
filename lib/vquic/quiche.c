@@ -305,8 +305,8 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
 
   // sidecar options
   if(conn->sidecar_threshold > 0) {
-    quiche_config_set_sidecar_threshold(qs->cfg, conn->sidecar_threshold);
-    quiche_config_enable_quack_reset(qs->cfg, conn->quack_reset);
+    quiche_config_sidecar_set_threshold(qs->cfg, conn->sidecar_threshold);
+    quiche_config_sidecar_enable_reset(qs->cfg, conn->quack_reset);
     if(conn->quack_style) {
       if(strcmp(conn->quack_style, "power_sum") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
