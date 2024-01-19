@@ -19,10 +19,16 @@ CFLAGS += -lquiche
 
 all: sidecurl tcpsidecurl
 
+debug: CFLAGS += -DDEBUG
+debug: sidecurl tcpsidecurl
+
 sidecurl: sidecurl.c writeout.c
 	$(CC) $^ $(CFLAGS) -o $@
 
 tcpsidecurl: tcpsidecurl.c writeout.c
 	$(CC) $^ $(CFLAGS) -o $@
+
+clean:
+	rm sidecurl tcpsidecurl
 
 .PHONY: all

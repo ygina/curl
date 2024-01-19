@@ -23,7 +23,7 @@ static char LAST_QUACK[4 * QUACK_SIZE]; /* 4x for good luck */
 
 char ERROR_BUFFER[CURL_ERROR_SIZE];
 
-static char *BINARY_NAME = "sidecurl";
+static char *BINARY_NAME = "tcpsidecurl";
 static char *URL, *WRITE_AFTER, *SIDECAR_QUACK_STYLE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         sidecar_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(5103);
+        addr.sin_port = htons(5103);  // listen for quacks on port 5103
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
         assert(!bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)));
         assert(!listen(sidecar_socket, 1));
@@ -137,7 +137,9 @@ int main(int argc, char **argv) {
 
                 void *conn = NULL;
                 checkok(curl_easy_getinfo(easy_handle, CURLINFO_QUICHE_CONN, &conn));
-                // printf("New quack: '%s'\n", LAST_QUACK);
+                #ifdef DEBUG
+                printf("New quack: '%s'\n", LAST_QUACK);
+                #endif
                 quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked,
                     &from_addr, from_addr_len);
 

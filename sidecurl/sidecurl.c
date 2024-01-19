@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         sidecar_socket = socket(AF_INET, SOCK_DGRAM, 0);
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
-        addr.sin_port = htons(5103);
+        addr.sin_port = htons(5103);  // listen for quacks on port 5103
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
         assert(!bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)));
     }
@@ -136,7 +136,9 @@ int main(int argc, char **argv) {
                 LAST_QUACK[n_bytes_quacked] = '\0';
                 void *conn = NULL;
                 checkok(curl_easy_getinfo(easy_handle, CURLINFO_QUICHE_CONN, &conn));
-                // printf("New quack: '%s'\n", LAST_QUACK);
+                #ifdef DEBUG
+                printf("New quack: '%s'\n", LAST_QUACK);
+                #endif
                 quiche_conn_recv_quack(conn, LAST_QUACK, n_bytes_quacked,
                     &from_addr, from_addr_len);
 
