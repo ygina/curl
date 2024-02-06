@@ -1,4 +1,4 @@
-SIDECAR_HOME = $(HOME)/sidecar
+SIDECAR_HOME = $(HOME)/sidekick
 CURL_LIB_DIR = $(SIDECAR_HOME)/http3_integration/curl/lib/.libs
 QUICHE_LIB_DIR = $(SIDECAR_HOME)/http3_integration/quiche/target/release
 
