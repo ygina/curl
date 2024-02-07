@@ -3,7 +3,7 @@
 Building cURL and sidecurl:
 
 ```
-export SIDECAR_HOME=$HOME/sidecar
+export SIDECAR_HOME=$HOME/sidekick
 $SIDECAR_HOME/deps/build_deps.sh 3  # libcurl
 $SIDECAR_HOME/deps/build_deps.sh 4  # sidecurl
 ```
@@ -17,16 +17,16 @@ compatible with `curl`.
 -o, --output <file>              write to <file> instead of stdout
 -1, --http1.1                    tell curl to use HTTP v1.1
 -3, --http3                      tell curl to use HTTP v3
-    --sidecar <threshold>        enable the sidecar and set the power sum quACK threshold
+    --sidekick <threshold>       enable the sidekick and set the power sum quACK threshold
     --mark-acked <bool>          use quacks to consider packets received (default: 0)
     --mark-lost-and-retx <bool>  use quacks to consider packets lost, and retransmit (default: 1)
     --update-cwnd <bool>         use quacks to update the cwnd on loss (default: 1)
     --near-delay <ms>            set the estimated delay between the sender and proxy, in ms (default: 1)
     --e2e-delay <ms>             set the estimated delay between the proxy and receiver, in ms (default: 26)
-    --enable-reset <bool>        whether to send sidecar reset messages (default: 1)
-    --reset-port <port>          port to send sidecar reset messages to (default: 1234)
-    --reset-threshold <ms>       threshold that determines frequency of sidecar reset messages (default: 10)
-    --reorder-threshold <pkts>   threshold for sidecar loss detection (default: 3)
+    --enable-reset <bool>        whether to send sidekick reset messages (default: 1)
+    --reset-port <port>          port to send sidekick reset messages to (default: 1234)
+    --reset-threshold <ms>       threshold that determines frequency of sidekick reset messages (default: 10)
+    --reorder-threshold <pkts>   threshold for sidekick loss detection (default: 3)
 -u, --quack-style <style>        style of quack to send/receive
     --disable-mtu-fix            disable fix that sends packets only if the cwnd > mtu
 -M, --min-ack-delay <ms>         minimum delay between acks, in ms
@@ -86,6 +86,6 @@ type type type
 Caveats with current implementation:
 
 * `tcpsidecurl` won't start doing anything (including the underlying curl
-  work) until it makes a TCP connection on the sidecar socket.
-* If the sidecar socket disconnects, `tcpsidecurl` will spin trying to read
+  work) until it makes a TCP connection on the sidekick socket.
+* If the sidekick socket disconnects, `tcpsidecurl` will spin trying to read
   from it.

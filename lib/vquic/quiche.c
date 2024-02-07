@@ -296,43 +296,43 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
                                        sizeof(QUICHE_H3_APPLICATION_PROTOCOL)
                                        - 1);
 
-  // additional non-sidecar options
-  quiche_config_enable_sidecar_mtu(qs->cfg, conn->sidecar_mtu);
+  // additional non-sidekick options
+  quiche_config_enable_sidekick_mtu(qs->cfg, conn->sidekick_mtu);
   if(conn->min_ack_delay > 0)
     quiche_config_set_min_ack_delay(qs->cfg, conn->min_ack_delay);
   if(conn->max_ack_delay > 0)
     quiche_config_set_max_ack_delay(qs->cfg, conn->max_ack_delay);
 
-  // sidecar options
-  if(conn->sidecar_threshold > 0) {
-    quiche_config_sidecar_set_threshold(qs->cfg, conn->sidecar_threshold);
-    quiche_config_sidecar_enable_mark_acked(qs->cfg, conn->sidecar_mark_acked);
-    quiche_config_sidecar_enable_mark_lost_and_retx(qs->cfg, conn->sidecar_mark_lost_and_retx);
-    quiche_config_sidecar_enable_update_cwnd(qs->cfg, conn->sidecar_update_cwnd);
-    quiche_config_sidecar_enable_reset(qs->cfg, conn->sidecar_reset);
+  // sidekick options
+  if(conn->sidekick_threshold > 0) {
+    quiche_config_sidekick_set_threshold(qs->cfg, conn->sidekick_threshold);
+    quiche_config_sidekick_enable_mark_acked(qs->cfg, conn->sidekick_mark_acked);
+    quiche_config_sidekick_enable_mark_lost_and_retx(qs->cfg, conn->sidekick_mark_lost_and_retx);
+    quiche_config_sidekick_enable_update_cwnd(qs->cfg, conn->sidekick_update_cwnd);
+    quiche_config_sidekick_enable_reset(qs->cfg, conn->sidekick_reset);
 
-    if(conn->sidecar_near_delay > 0 && conn->sidecar_e2e_delay > 0) {
-      quiche_config_sidecar_set_delay_ratio(qs->cfg, conn->sidecar_near_delay, conn->sidecar_e2e_delay);
+    if(conn->sidekick_near_delay > 0 && conn->sidekick_e2e_delay > 0) {
+      quiche_config_sidekick_set_delay_ratio(qs->cfg, conn->sidekick_near_delay, conn->sidekick_e2e_delay);
     }
 
-    if(conn->sidecar_reset) {
-      if(conn->sidecar_reset_port > 0)
-        quiche_config_sidecar_set_reset_port(qs->cfg, conn->sidecar_reset_port);
-      if(conn->sidecar_reset_threshold > 0)
-        quiche_config_sidecar_set_reset_threshold(qs->cfg, conn->sidecar_reset_threshold);
+    if(conn->sidekick_reset) {
+      if(conn->sidekick_reset_port > 0)
+        quiche_config_sidekick_set_reset_port(qs->cfg, conn->sidekick_reset_port);
+      if(conn->sidekick_reset_threshold > 0)
+        quiche_config_sidekick_set_reset_threshold(qs->cfg, conn->sidekick_reset_threshold);
     }
 
-    if(conn->sidecar_reorder_threshold > 0)
-      quiche_config_sidecar_set_reorder_threshold(qs->cfg, conn->sidecar_reorder_threshold);
+    if(conn->sidekick_reorder_threshold > 0)
+      quiche_config_sidekick_set_reorder_threshold(qs->cfg, conn->sidekick_reorder_threshold);
 
-    if(conn->sidecar_quack_style) {
-      if(strcmp(conn->sidecar_quack_style, "power_sum") == 0)
+    if(conn->sidekick_quack_style) {
+      if(strcmp(conn->sidekick_quack_style, "power_sum") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_POWER_SUM);
-      if(strcmp(conn->sidecar_quack_style, "strawman_a") == 0)
+      if(strcmp(conn->sidekick_quack_style, "strawman_a") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_A);
-      if(strcmp(conn->sidecar_quack_style, "strawman_b") == 0)
+      if(strcmp(conn->sidekick_quack_style, "strawman_b") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_B);
-      if(strcmp(conn->sidecar_quack_style, "strawman_c") == 0)
+      if(strcmp(conn->sidekick_quack_style, "strawman_c") == 0)
         quiche_config_set_quack_style(qs->cfg, QUICHE_QUACK_STRAWMAN_C);
     }
   }

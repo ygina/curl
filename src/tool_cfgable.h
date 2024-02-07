@@ -45,19 +45,19 @@ struct State {
 };
 
 struct OperationConfig {
-  /* sidecar options */
-  long sidecar_threshold;
-  bool sidecar_mark_acked;
-  bool sidecar_mark_lost_and_retx;
-  bool sidecar_update_cwnd;
-  long sidecar_near_delay;
-  long sidecar_e2e_delay;
-  bool sidecar_reset;
-  long sidecar_reset_port;
-  long sidecar_reset_threshold;
-  long sidecar_reorder_threshold;
-  char *sidecar_quack_style;
-  bool sidecar_mtu;
+  /* sidekick options */
+  long sidekick_threshold;
+  bool sidekick_mark_acked;
+  bool sidekick_mark_lost_and_retx;
+  bool sidekick_update_cwnd;
+  long sidekick_near_delay;
+  long sidekick_e2e_delay;
+  bool sidekick_reset;
+  long sidekick_reset_port;
+  long sidekick_reset_threshold;
+  long sidekick_reorder_threshold;
+  char *sidekick_quack_style;
+  bool sidekick_mtu;
   long min_ack_delay;
   long max_ack_delay;
 

@@ -44,22 +44,22 @@ void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
-    int use_sidecar = SIDECAR_THRESHOLD > 0;
+    int use_sidekick = SIDECAR_THRESHOLD > 0;
 
     /*** OPEN A SIDECAR SOCKET ***/
     ssize_t n_bytes_quacked, n_bytes_in_buffer = 0;
-    int sidecar_socket, sidecar_fd;
+    int sidekick_socket, sidekick_fd;
     struct sockaddr from_addr;
     socklen_t from_addr_len = sizeof(from_addr);
-    if (use_sidecar) {
-        sidecar_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (use_sidekick) {
+        sidekick_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         struct sockaddr_in addr;
         addr.sin_family = AF_INET;
         addr.sin_port = htons(5103);  // listen for quacks on port 5103
         addr.sin_addr.s_addr = htonl(INADDR_ANY);
-        assert(!bind(sidecar_socket, (struct sockaddr *)&addr, sizeof(addr)));
-        assert(!listen(sidecar_socket, 1));
-        assert(0 <= (sidecar_fd = accept(sidecar_socket, &from_addr, &from_addr_len)));
+        assert(!bind(sidekick_socket, (struct sockaddr *)&addr, sizeof(addr)));
+        assert(!listen(sidekick_socket, 1));
+        assert(0 <= (sidekick_fd = accept(sidekick_socket, &from_addr, &from_addr_len)));
     }
 
     /*** OPEN A CURL HANDLE ***/
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
         checkok(curl_easy_setopt(easy_handle, CURLOPT_SSL_VERIFYHOST, 0L));
     }
     checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
-    // Set sidecar options
+    // Set sidekick options
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_ACKED, SIDECAR_MARK_ACKED));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_LOST_AND_RETX, SIDECAR_MARK_LOST_AND_RETX));
@@ -120,16 +120,16 @@ int main(int argc, char **argv) {
             curl_multi_perform(multi_handle, &n_transfers_running);
         }
         // Then add ours
-        if (use_sidecar) {
-            assert(sidecar_fd < FD_SETSIZE);
-            FD_SET(sidecar_fd, &fdread);
+        if (use_sidekick) {
+            assert(sidekick_fd < FD_SETSIZE);
+            FD_SET(sidekick_fd, &fdread);
         }
 
         /*** SELECT ***/
         select(maxfd + 2, &fdread, &fdwrite, &fdexcep, &timeout);
-        if (use_sidecar && FD_ISSET(sidecar_fd, &fdread)) {
+        if (use_sidekick && FD_ISSET(sidekick_fd, &fdread)) {
             n_bytes_quacked = read(
-                sidecar_fd, LAST_QUACK + n_bytes_in_buffer,
+                sidekick_fd, LAST_QUACK + n_bytes_in_buffer,
                 QUACK_SIZE - n_bytes_in_buffer);
             if (n_bytes_quacked > 0) {
                 n_bytes_in_buffer += n_bytes_quacked;
@@ -175,16 +175,16 @@ void usage() {
 "-o, --output <file>         write to <file> instead of stdout\n"
 "-1, --http1.1               tell curl to use HTTP v1.1\n"
 "-3, --http3                 tell curl to use HTTP v3\n"
-"    --sidecar <threshold>        enable the sidecar and set the power sum quACK threshold\n"
+"    --sidekick <threshold>       enable the sidekick and set the power sum quACK threshold\n"
 "    --mark-acked <bool>          use quacks to consider packets received (default: 0)\n"
 "    --mark-lost-and-retx <bool>  use quacks to consider packets lost, and retransmit (default: 1)\n"
 "    --update-cwnd <bool>         use quacks to update the cwnd on loss (default: 1)\n"
 "    --near-delay <ms>            set the estimated delay between the sender and proxy, in ms (default: 1)\n"
 "    --e2e-delay <ms>             set the estimated delay between the proxy and receiver, in ms (default: 26)\n"
-"    --enable-reset <bool>        whether to send sidecar reset messages (default: 1)\n"
-"    --reset-port <port>          port to send sidecar reset messages to (default: 1234)\n"
-"    --reset-threshold <ms>       threshold that determines frequency of sidecar reset messages (default: 10)\n"
-"    --reorder-threshold <pkts>   threshold for sidecar loss detection (default: 3)\n"
+"    --enable-reset <bool>        whether to send sidekick reset messages (default: 1)\n"
+"    --reset-port <port>          port to send sidekick reset messages to (default: 1234)\n"
+"    --reset-threshold <ms>       threshold that determines frequency of sidekick reset messages (default: 10)\n"
+"    --reorder-threshold <pkts>   threshold for sidekick loss detection (default: 3)\n"
 "-u, --quack-style <style>        style of quack to send/receive\n"
 "    --disable-mtu-fix            disable fix that sends packets only if the cwnd > mtu\n"
 "-M, --min-ack-delay <ms>         minimum delay between acks, in ms\n"
@@ -211,7 +211,7 @@ void parseargs(int argc, char **argv) {
         {"http3",       no_argument,       0, '3'},
         {"verbose",     no_argument,       0, 'v'},
         // SIDECAR-SPECIFIC OPTIONS
-        {"sidecar",            required_argument, 0, 'a'},
+        {"sidekick",           required_argument, 0, 'a'},
         {"mark-acked",         required_argument, 0, 'b'},
         {"mark-lost-and-retx", required_argument, 0, 'c'},
         {"update-cwnd",        required_argument, 0, 'e'},
