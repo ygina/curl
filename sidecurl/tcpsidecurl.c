@@ -24,16 +24,16 @@ static char LAST_QUACK[4 * QUACK_SIZE]; /* 4x for good luck */
 char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "tcpsidecurl";
-static char *URL, *WRITE_AFTER, *SIDECAR_QUACK_STYLE;
+static char *URL, *WRITE_AFTER, *SIDEKICK_QUACK_STYLE;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
-static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY, SIDECAR_MTU = 1;
-static int SIDECAR_THRESHOLD, SIDECAR_MARK_ACKED = 0,
-           SIDECAR_MARK_LOST_AND_RETX = 1, SIDECAR_UPDATE_CWND = 1,
-           SIDECAR_NEAR_DELAY, SIDECAR_E2E_DELAY;
-static int SIDECAR_RESET = 1, SIDECAR_RESET_PORT,
-           SIDECAR_RESET_THRESHOLD;
-static int SIDECAR_REORDER_THRESHOLD;
+static int QUICHE_MIN_ACK_DELAY, QUICHE_MAX_ACK_DELAY, SIDEKICK_MTU = 1;
+static int SIDEKICK_THRESHOLD, SIDEKICK_MARK_ACKED = 0,
+           SIDEKICK_MARK_LOST_AND_RETX = 1, SIDEKICK_UPDATE_CWND = 1,
+           SIDEKICK_NEAR_DELAY, SIDEKICK_E2E_DELAY;
+static int SIDEKICK_RESET = 1, SIDEKICK_RESET_PORT,
+           SIDEKICK_RESET_THRESHOLD;
+static int SIDEKICK_REORDER_THRESHOLD;
 static int INSECURE, VERBOSE;
 static long HTTP_VERSION = CURL_HTTP_VERSION_NONE;
 static double TIMEOUT_SECS;
@@ -44,9 +44,9 @@ void quiche_conn_recv_quack(void *conn, uint8_t *quack_buf, size_t quack_buf_len
 
 int main(int argc, char **argv) {
     parseargs(argc, argv);
-    int use_sidekick = SIDECAR_THRESHOLD > 0;
+    int use_sidekick = SIDEKICK_THRESHOLD > 0;
 
-    /*** OPEN A SIDECAR SOCKET ***/
+    /*** OPEN A SIDEKICK SOCKET ***/
     ssize_t n_bytes_quacked, n_bytes_in_buffer = 0;
     int sidekick_socket, sidekick_fd;
     struct sockaddr from_addr;
@@ -83,18 +83,18 @@ int main(int argc, char **argv) {
     }
     checkok(curl_easy_setopt(easy_handle, CURLOPT_VERBOSE, VERBOSE));
     // Set sidekick options
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_THRESHOLD, SIDECAR_THRESHOLD));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_ACKED, SIDECAR_MARK_ACKED));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MARK_LOST_AND_RETX, SIDECAR_MARK_LOST_AND_RETX));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_UPDATE_CWND, SIDECAR_UPDATE_CWND));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_NEAR_DELAY, SIDECAR_NEAR_DELAY));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_E2E_DELAY, SIDECAR_E2E_DELAY));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET, SIDECAR_RESET));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET_PORT, SIDECAR_RESET_PORT));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_RESET_THRESHOLD, SIDECAR_RESET_THRESHOLD));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_REORDER_THRESHOLD, SIDECAR_REORDER_THRESHOLD));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_QUACK_STYLE, SIDECAR_QUACK_STYLE));
-    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDECAR_MTU, SIDECAR_MTU));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_THRESHOLD, SIDEKICK_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_MARK_ACKED, SIDEKICK_MARK_ACKED));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_MARK_LOST_AND_RETX, SIDEKICK_MARK_LOST_AND_RETX));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_UPDATE_CWND, SIDEKICK_UPDATE_CWND));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_NEAR_DELAY, SIDEKICK_NEAR_DELAY));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_E2E_DELAY, SIDEKICK_E2E_DELAY));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_RESET, SIDEKICK_RESET));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_RESET_PORT, SIDEKICK_RESET_PORT));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_RESET_THRESHOLD, SIDEKICK_RESET_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_REORDER_THRESHOLD, SIDEKICK_REORDER_THRESHOLD));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_QUACK_STYLE, SIDEKICK_QUACK_STYLE));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_MTU, SIDEKICK_MTU));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MIN_ACK_DELAY, QUICHE_MIN_ACK_DELAY));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MAX_ACK_DELAY, QUICHE_MAX_ACK_DELAY));
 
@@ -210,7 +210,7 @@ void parseargs(int argc, char **argv) {
         {"http1.1",     no_argument,       0, '1'},
         {"http3",       no_argument,       0, '3'},
         {"verbose",     no_argument,       0, 'v'},
-        // SIDECAR-SPECIFIC OPTIONS
+        // SIDEKICK-SPECIFIC OPTIONS
         {"sidekick",           required_argument, 0, 'a'},
         {"mark-acked",         required_argument, 0, 'b'},
         {"mark-lost-and-retx", required_argument, 0, 'c'},
@@ -252,18 +252,18 @@ void parseargs(int argc, char **argv) {
         case '1': HTTP_VERSION = CURL_HTTP_VERSION_1_1; break;
         case '3': HTTP_VERSION = CURL_HTTP_VERSION_3; break;
         case 'v': VERBOSE = 1; break;
-        case 'a': SIDECAR_THRESHOLD = atoi(optarg); break;
-        case 'b': SIDECAR_MARK_ACKED = atoi(optarg); break;
-        case 'c': SIDECAR_MARK_LOST_AND_RETX = atoi(optarg); break;
-        case 'e': SIDECAR_UPDATE_CWND = atoi(optarg); break;
-        case 'f': SIDECAR_NEAR_DELAY = atoi(optarg); break;
-        case 'g': SIDECAR_E2E_DELAY = atoi(optarg); break;
-        case 'h': SIDECAR_RESET = atoi(optarg); break;
-        case 'i': SIDECAR_RESET_PORT = atoi(optarg); break;
-        case 'l': SIDECAR_RESET_THRESHOLD = atoi(optarg); break;
-        case 'n': SIDECAR_REORDER_THRESHOLD = atoi(optarg); break;
-        case 'p': SIDECAR_QUACK_STYLE = strdup(optarg); break;
-        case 'q': SIDECAR_MTU = 0; break;
+        case 'a': SIDEKICK_THRESHOLD = atoi(optarg); break;
+        case 'b': SIDEKICK_MARK_ACKED = atoi(optarg); break;
+        case 'c': SIDEKICK_MARK_LOST_AND_RETX = atoi(optarg); break;
+        case 'e': SIDEKICK_UPDATE_CWND = atoi(optarg); break;
+        case 'f': SIDEKICK_NEAR_DELAY = atoi(optarg); break;
+        case 'g': SIDEKICK_E2E_DELAY = atoi(optarg); break;
+        case 'h': SIDEKICK_RESET = atoi(optarg); break;
+        case 'i': SIDEKICK_RESET_PORT = atoi(optarg); break;
+        case 'l': SIDEKICK_RESET_THRESHOLD = atoi(optarg); break;
+        case 'n': SIDEKICK_REORDER_THRESHOLD = atoi(optarg); break;
+        case 'p': SIDEKICK_QUACK_STYLE = strdup(optarg); break;
+        case 'q': SIDEKICK_MTU = 0; break;
         case 'r': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
         case 's': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
         case '?': usage();

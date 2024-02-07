@@ -3121,40 +3121,40 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
     break;
 
 #ifdef USE_QUICHE
-  case CURLOPT_SIDECAR_THRESHOLD:
+  case CURLOPT_SIDEKICK_THRESHOLD:
     data->set.sidekick_threshold = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_MARK_ACKED:
+  case CURLOPT_SIDEKICK_MARK_ACKED:
     data->set.sidekick_mark_acked = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
-  case CURLOPT_SIDECAR_MARK_LOST_AND_RETX:
+  case CURLOPT_SIDEKICK_MARK_LOST_AND_RETX:
     data->set.sidekick_mark_lost_and_retx = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
-  case CURLOPT_SIDECAR_UPDATE_CWND:
+  case CURLOPT_SIDEKICK_UPDATE_CWND:
     data->set.sidekick_update_cwnd = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
-  case CURLOPT_SIDECAR_NEAR_DELAY:
+  case CURLOPT_SIDEKICK_NEAR_DELAY:
     data->set.sidekick_near_delay = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_E2E_DELAY:
+  case CURLOPT_SIDEKICK_E2E_DELAY:
     data->set.sidekick_e2e_delay = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_RESET:
+  case CURLOPT_SIDEKICK_RESET:
     data->set.sidekick_reset = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
-  case CURLOPT_SIDECAR_RESET_PORT:
+  case CURLOPT_SIDEKICK_RESET_PORT:
     data->set.sidekick_reset_port = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_RESET_THRESHOLD:
+  case CURLOPT_SIDEKICK_RESET_THRESHOLD:
     data->set.sidekick_reset_threshold = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_REORDER_THRESHOLD:
+  case CURLOPT_SIDEKICK_REORDER_THRESHOLD:
     data->set.sidekick_reorder_threshold = va_arg(param, long);
     break;
-  case CURLOPT_SIDECAR_QUACK_STYLE:
+  case CURLOPT_SIDEKICK_QUACK_STYLE:
     data->set.sidekick_quack_style = va_arg(param, char *);
     break;
-  case CURLOPT_SIDECAR_MTU:
+  case CURLOPT_SIDEKICK_MTU:
     data->set.sidekick_mtu = (0 != va_arg(param, long)) ? TRUE : FALSE;
     break;
   case CURLOPT_QUICHE_MIN_ACK_DELAY:

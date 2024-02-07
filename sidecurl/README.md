@@ -3,9 +3,9 @@
 Building cURL and sidecurl:
 
 ```
-export SIDECAR_HOME=$HOME/sidekick
-$SIDECAR_HOME/deps/build_deps.sh 3  # libcurl
-$SIDECAR_HOME/deps/build_deps.sh 4  # sidecurl
+export SIDEKICK_HOME=$HOME/sidekick
+$SIDEKICK_HOME/deps/build_deps.sh 3  # libcurl
+$SIDEKICK_HOME/deps/build_deps.sh 4  # sidecurl
 ```
 
 ## Supported Options
