@@ -1564,6 +1564,7 @@ static struct connectdata *allocate_conn(struct Curl_easy *data)
   conn->sidekick_mtu = data->set.sidekick_mtu;
   conn->min_ack_delay = data->set.min_ack_delay;
   conn->max_ack_delay = data->set.max_ack_delay;
+  conn->congestion_control = data->set.congestion_control;
 #endif
 
   conn->sock[FIRSTSOCKET] = CURL_SOCKET_BAD;     /* no file descriptor */

@@ -302,6 +302,12 @@ CURLcode Curl_quic_connect(struct Curl_easy *data,
     quiche_config_set_min_ack_delay(qs->cfg, conn->min_ack_delay);
   if(conn->max_ack_delay > 0)
     quiche_config_set_max_ack_delay(qs->cfg, conn->max_ack_delay);
+  if(conn->congestion_control) {
+    if(strcmp(conn->congestion_control, "cubic") == 0)
+      quiche_config_set_cc_algorithm_name(qs->cfg, "cubic");
+    if(strcmp(conn->congestion_control, "bbr") == 0)
+      quiche_config_set_cc_algorithm_name(qs->cfg, "bbr");
+  }
 
   // sidekick options
   if(conn->sidekick_threshold > 0) {

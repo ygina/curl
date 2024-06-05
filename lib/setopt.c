@@ -3163,6 +3163,9 @@ CURLcode Curl_vsetopt(struct Curl_easy *data, CURLoption option, va_list param)
   case CURLOPT_QUICHE_MAX_ACK_DELAY:
     data->set.max_ack_delay = va_arg(param, long);
     break;
+  case CURLOPT_QUICHE_CONGESTION_CONTROL:
+    data->set.congestion_control = va_arg(param, char *);
+    break;
 #endif
 
   default:

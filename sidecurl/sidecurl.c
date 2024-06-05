@@ -25,6 +25,7 @@ char ERROR_BUFFER[CURL_ERROR_SIZE];
 
 static char *BINARY_NAME = "sidecurl";
 static char *URL, *WRITE_AFTER, *SIDEKICK_QUACK_STYLE;
+static char *QUICHE_CONGESTION_CONTROL;
 static struct curl_slist *HEADERS = NULL;
 static FILE *BODY_INPUT_FILE;
 static FILE *OUTPUT_FILE;
@@ -95,6 +96,7 @@ int main(int argc, char **argv) {
     checkok(curl_easy_setopt(easy_handle, CURLOPT_SIDEKICK_MTU, SIDEKICK_MTU));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MIN_ACK_DELAY, QUICHE_MIN_ACK_DELAY));
     checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_MAX_ACK_DELAY, QUICHE_MAX_ACK_DELAY));
+    checkok(curl_easy_setopt(easy_handle, CURLOPT_QUICHE_CONGESTION_CONTROL, QUICHE_CONGESTION_CONTROL));
 
     CURLM *multi_handle = curl_multi_init();
     checkok(curl_multi_add_handle(multi_handle, easy_handle));
@@ -189,6 +191,7 @@ void usage() {
 "    --disable-mtu-fix            disable fix that sends packets only if the cwnd > mtu\n"
 "-M, --min-ack-delay <ms>         minimum delay between acks, in ms\n"
 "-D, --max-ack-delay <ms>         maximum delay between acks, in ms\n"
+"    --congestion-control <ms>    congestion control algorithm\n"
 "    --header header         extra header to include in information sent\n"
 "-w, --write-out <format>    format string for display on stdout afterwards\n"
 "-d, --data-binary @<file>   send the contents of @<file> as an HTTP POST\n"
@@ -226,6 +229,7 @@ void parseargs(int argc, char **argv) {
         {"disable-mtu-fix",    no_argument,       0, 'q'},
         {"min-ack-delay",      required_argument, 0, 'r'},
         {"max-ack-delay",      required_argument, 0, 's'},
+        {"congestion-control", required_argument, 0, 't'},
         {0, 0, 0, 0},
     };
     while (1) {
@@ -268,6 +272,7 @@ void parseargs(int argc, char **argv) {
         case 'q': SIDEKICK_MTU = 0; break;
         case 'r': QUICHE_MIN_ACK_DELAY = atoi(optarg); break;
         case 's': QUICHE_MAX_ACK_DELAY = atoi(optarg); break;
+        case 't': QUICHE_CONGESTION_CONTROL = strdup(optarg); break;
         case '?': usage();
         }
     }

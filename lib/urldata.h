@@ -930,6 +930,7 @@ struct connectdata {
   bool sidekick_mtu;
   size_t min_ack_delay;
   size_t max_ack_delay;
+  char *congestion_control;
   struct quicsocket hequic[2]; /* two, for happy eyeballs! */
   struct quicsocket *quic;
 #endif
@@ -1642,6 +1643,7 @@ struct UserDefined {
   bool sidekick_mtu;                 /* send packets only if the cwnd > mtu */
   long min_ack_delay;                /* min delay between acks, in ms */
   long max_ack_delay;                /* max delay between acks, in ms */
+  char *congestion_control;          /* congestion control algorithm */
 
   FILE *err;         /* the stderr user data goes here */
   void *debugdata;   /* the data that will be passed to fdebug */

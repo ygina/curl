@@ -60,6 +60,7 @@ struct OperationConfig {
   bool sidekick_mtu;
   long min_ack_delay;
   long max_ack_delay;
+  char *congestion_control;
 
   /* original options */
   bool remote_time;
